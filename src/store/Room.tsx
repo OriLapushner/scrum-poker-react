@@ -33,6 +33,7 @@ interface RoomStore extends RoomState {
     getVotesState: () => VotesState;
     getLocalGuestVoteValue: () => VoteValue;
     getIsReadyToReveal: () => boolean;
+    getCurrentRoundResults: () => GameRoundResult;
     getPreviousRoundsResults: () => GameRoundResult[];
 
     // Event handlers
@@ -292,6 +293,12 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
                 displayName: card.displayName
             };
         });
+    },
+
+    getCurrentRoundResults: () => {
+        const state = get();
+        const totalVotesValue = state.currentRound.reduce((acc, vote) => { return acc + (vote.voteValue ?? 0) }, 0);
+        return { result: totalVotesValue / state.currentRound.length };
     },
 
     getIsReadyToReveal: () => {

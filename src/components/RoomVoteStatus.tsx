@@ -2,30 +2,30 @@ import React, { useEffect, useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FlippableCard } from "@/components/FlippableCard";
+import { Separator } from "@/components/ui/separator";
 
 interface RoomVoteStatusProps {
 	votes: VoteEntry[];
 	isRevealed: boolean;
+	currentRoundResult: GameRoundResult;
 }
 
-export function RoomVoteStatus({ votes, isRevealed }: RoomVoteStatusProps) {
+export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVoteStatusProps) {
 	const totalVotes = votes.length;
 	const votedCount = votes.filter(vote => vote.cardValue !== null).length;
 	const [flippedCards, setFlippedCards] = useState<{ [key: string]: boolean }>({});
 
 	useEffect(() => {
 		if (isRevealed) {
-			// Flip cards sequentially
 			votes.forEach((vote, index) => {
 				setTimeout(() => {
 					setFlippedCards(prev => ({
 						...prev,
 						[vote.guest.id]: true
 					}));
-				}, index * 200); // 0.2s delay between each card
+				}, index * 200);
 			});
 		} else {
-			// Reset all cards when isRevealed becomes false
 			setFlippedCards({});
 		}
 	}, [isRevealed, votes]);
@@ -33,7 +33,7 @@ export function RoomVoteStatus({ votes, isRevealed }: RoomVoteStatusProps) {
 	const renderFrontContent = (value: number | null) => (
 		<Card
 			className={`w-full h-full flex items-center justify-center transition-all duration-200 
-        ${value !== null
+            ${value !== null
 					? 'bg-blue-100 shadow-lg ring-2 ring-blue-400'
 					: 'bg-gray-50 hover:bg-gray-100'}`}
 		>
@@ -75,10 +75,27 @@ export function RoomVoteStatus({ votes, isRevealed }: RoomVoteStatusProps) {
 				))}
 			</div>
 
-			<div className="flex justify-center text-lg">
-				<Badge className="px-5 py-2 text-sm font-semibold bg-slate-600 text-gray-200" variant="outline">
-					<span>{`${votedCount} / ${totalVotes} votes`}</span>
-				</Badge>
+			<div className="flex flex-col items-center space-y-4">
+
+				{!isRevealed && (
+					<Badge className="px-5 py-2 text-sm font-semibold bg-slate-600 text-gray-200" variant="outline">
+						<span>{`${votedCount} / ${totalVotes} votes`}</span>
+					</Badge>
+				)}
+
+				{isRevealed && (
+					<>
+						<Separator className="my-2" />
+						<Card className="px-6 py-3">
+							<div className="flex items-baseline gap-2">
+								<span className="text-sm text-gray-500">Average:</span>
+								<span className="text-2xl font-bold text-blue-600">
+									{currentRoundResult.result}
+								</span>
+							</div>
+						</Card>
+					</>
+				)}
 			</div>
 		</div>
 	);

@@ -22,6 +22,7 @@ const ScrumPokerLayout = () => {
 	const roomIdFromStore = useRoomStore(state => state.roomId);
 	const isRevealed = useRoomStore(state => state.isRevealed);
 
+	const currentRoundResults = useRoomStore(state => state.getCurrentRoundResults());
 	const previousRoundsResults = useRoomStore(state => state.getPreviousRoundsResults());
 	const isReadyToReveal = useRoomStore(state => state.getIsReadyToReveal());
 	const allGuests = useRoomStore(state => state.getAllGuests());
@@ -102,15 +103,16 @@ const ScrumPokerLayout = () => {
 				</div>
 
 				<div className="flex-grow flex flex-col items-center justify-center space-y-8 basis-96 min-w-[300px]">
-					<RoomVoteStatus votes={votesState} isRevealed={isRevealed} />
-					<PulsatingButton
+					<RoomVoteStatus votes={votesState} isRevealed={isRevealed} currentRoundResult={currentRoundResults} />
+
+					{!isRevealed && <PulsatingButton
 						onClick={handleRevealCardClicked}
 						className="bg-blue-600 hover:bg-blue-700"
 						disabled={!isReadyToReveal}
 						isPulsating={isReadyToReveal}
 					>
 						Reveal Votes
-					</PulsatingButton>
+					</PulsatingButton>}
 					{isRevealed && <Button onClick={startNewRound}>
 						New round</Button>}
 				</div>
