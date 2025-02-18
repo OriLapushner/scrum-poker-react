@@ -38,7 +38,7 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 					: 'bg-gray-50 hover:bg-gray-100'}`}
 		>
 			{value !== null ? (
-				<span className="text-blue-600 font-bold text-lg">✓{value}</span>
+				<span className="text-blue-600 font-bold text-lg">✓</span>
 			) : (
 				<span className="text-gray-400 text-sm">pending</span>
 			)}

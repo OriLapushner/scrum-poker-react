@@ -36,7 +36,9 @@ const ScrumPokerLayout = () => {
 
 	const params = useParams();
 	const roomId = typeof params.id === 'string' ? params.id : '';
-	const roomLink = `https://scrum-poker.app/room/${roomId}`;
+	const domain = window?.location?.host || '';
+	const protocol = window?.location?.protocol || 'https'
+	const roomLink = `${protocol}://${domain}/room/${roomId}`;
 
 	const handleRevealCardClicked = async () => {
 		try {
