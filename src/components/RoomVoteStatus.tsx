@@ -3,16 +3,6 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FlippableCard } from "@/components/FlippableCard";
 
-interface Guest {
-	id: string;
-	name: string;
-}
-
-interface VoteEntry {
-	guest: Guest;
-	value: number | null;
-}
-
 interface RoomVoteStatusProps {
 	votes: VoteEntry[];
 	isRevealed: boolean;
@@ -20,7 +10,7 @@ interface RoomVoteStatusProps {
 
 export function RoomVoteStatus({ votes, isRevealed }: RoomVoteStatusProps) {
 	const totalVotes = votes.length;
-	const votedCount = votes.filter(vote => vote.value !== null).length;
+	const votedCount = votes.filter(vote => vote.cardValue !== null).length;
 	const [flippedCards, setFlippedCards] = useState<{ [key: string]: boolean }>({});
 
 	useEffect(() => {
@@ -48,19 +38,19 @@ export function RoomVoteStatus({ votes, isRevealed }: RoomVoteStatusProps) {
 					: 'bg-gray-50 hover:bg-gray-100'}`}
 		>
 			{value !== null ? (
-				<span className="text-blue-600 font-bold text-lg">✓</span>
+				<span className="text-blue-600 font-bold text-lg">✓{value}</span>
 			) : (
 				<span className="text-gray-400 text-sm">pending</span>
 			)}
 		</Card>
 	);
 
-	const renderBackContent = (value: number | null) => (
+	const renderBackContent = (displayName: string | null) => (
 		<Card
 			className="w-full h-full flex items-center justify-center bg-blue-500 text-white"
 		>
 			<span className="font-bold text-2xl">
-				{value ?? '?'}
+				{displayName ?? '?'}
 			</span>
 		</Card>
 	);
@@ -68,11 +58,11 @@ export function RoomVoteStatus({ votes, isRevealed }: RoomVoteStatusProps) {
 	return (
 		<div className="space-y-6 w-full max-w-lg">
 			<div className="grid grid-cols-3 gap-4 place-items-center">
-				{votes.map(({ guest, value }) => (
+				{votes.map(({ guest, cardValue, displayName }) => (
 					<div key={guest.id} className="w-full flex flex-col items-center space-y-2">
 						<FlippableCard
-							frontContent={renderFrontContent(value)}
-							backContent={renderBackContent(value)}
+							frontContent={renderFrontContent(cardValue)}
+							backContent={renderBackContent(displayName)}
 							isFlipped={flippedCards[guest.id] ?? false}
 							width="w-16"
 							height="h-24"

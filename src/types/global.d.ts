@@ -50,7 +50,8 @@ declare global {
 
     type VoteEntry = {
         guest: Guest,
-        value: VoteValue
+        cardValue: number | null
+        displayName: string
     }
 
     type GameRoundResult = {

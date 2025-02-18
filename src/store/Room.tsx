@@ -162,8 +162,7 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
 
             socket.on('connect', () => {
             });
-            const secretId = state.getSecretIdFromLocalStorage(payload.roomId);
-            socket.emit('join_room', { ...payload, secretId }, (response: JoinRoomResponse) => {
+            socket.emit('join_room', { ...payload }, (response: JoinRoomResponse) => {
                 if (response.error) {
                     reject(new Error(`Join room failed: ${response.error}`));
                     return;
@@ -286,9 +285,11 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
         const state = get();
         return state.getVotingGuests().map(guest => {
             const vote = state.currentRound.find(vote => vote.guestId === guest.id);
+            const card = state.deck.cards[vote?.voteValue ?? 0];
             return {
                 guest,
-                value: vote?.voteValue ?? null
+                cardValue: !vote?.voteValue ? null : card.value,
+                displayName: card.displayName
             };
         });
     },
