@@ -24,6 +24,7 @@ interface RoomStore extends RoomState {
     addRemoteGuest: (guest: Guest) => void;
     removeRemoteGuest: (guestId: string) => void;
     setCurrentRoundVote: (vote: Vote) => void;
+    setNewRoundState: () => void;
 
     // Getters
     getRoomsFromLocalStorage: () => { secretId: string, roomId: string, timeStamp: number }[] | null;
@@ -33,6 +34,7 @@ interface RoomStore extends RoomState {
     getVotesState: () => VotesState;
     getLocalGuestVoteValue: () => VoteValue;
     getIsReadyToReveal: () => boolean;
+    getResultFromRound: (round: GameRound, cards: Card[]) => GameRoundResult;
     getCurrentRoundResults: () => GameRoundResult;
     getPreviousRoundsResults: () => GameRoundResult[];
 
@@ -84,6 +86,17 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
         return { currentRound };
     }),
 
+    setNewRoundState: () => {
+        const state = get();
+        set({
+            currentRound: [],
+            isRevealed: false,
+            previousRounds: [...state.previousRounds, state.currentRound],
+            localGuest: { ...state.localGuest, isInRound: true },
+            remoteGuests: state.remoteGuests.map(guest => ({ ...guest, isInRound: true }))
+        });
+    },
+
     // Event handlers
     handleGuestJoined: (guest: Guest) => {
         get().addRemoteGuest(guest);
@@ -101,7 +114,7 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
         set({ isRevealed: true });
     },
     handleNewRoundStarted: () => {
-        get().startNewRound();
+        get().setNewRoundState();
     },
     handleGuestDisconnected: (guestId: string) => {
         const guest = get().remoteGuests.find(guest => guest.id === guestId)
@@ -221,17 +234,12 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
 
     startNewRound: () => {
         return new Promise<void>((resolve, reject) => {
-            get().socket?.emit('start_new_round', {}, (response: { error: string }) => {
+            const state = get();
+            state.socket?.emit('start_new_round', {}, (response: { error: string }) => {
                 if (response.error) {
                     return reject(new Error(`Start new round failed: ${response.error}`));
                 }
-                set({
-                    currentRound: [],
-                    isRevealed: false,
-                    previousRounds: [...get().previousRounds, get().currentRound],
-                    localGuest: { ...get().localGuest, isInRound: true },
-                    remoteGuests: get().remoteGuests.map(guest => ({ ...guest, isInRound: true }))
-                });
+                state.setNewRoundState();
                 resolve();
             });
         });
@@ -295,10 +303,20 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
         });
     },
 
+    getResultFromRound: (round: GameRound, cards: Card[]) => {
+        const totalVotesValue = round.reduce((acc, vote) => {
+            let result = 0;
+            if (vote.voteValue !== null) {
+                result = cards[vote.voteValue].value;
+            }
+            return acc + result
+        }, 0);
+        return { result: totalVotesValue / round.length };
+    },
+
     getCurrentRoundResults: () => {
         const state = get();
-        const totalVotesValue = state.currentRound.reduce((acc, vote) => { return acc + (vote.voteValue ?? 0) }, 0);
-        return { result: totalVotesValue / state.currentRound.length };
+        return state.getResultFromRound(state.currentRound, state.deck.cards);
     },
 
     getIsReadyToReveal: () => {
@@ -309,11 +327,7 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
     getPreviousRoundsResults: () => {
         const state = get();
         return state.previousRounds.map(round => {
-            const totalVotesValue = round.reduce((acc, vote) => { return acc + (vote.voteValue ?? 0) }, 0);
-            return {
-                result: totalVotesValue / round.length
-            };
+            return state.getResultFromRound(round, state.deck.cards);
         })
     }
-
 }));
