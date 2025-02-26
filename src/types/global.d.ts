@@ -18,15 +18,30 @@ declare global {
         isInRound: boolean
     }
 
+    type errorResponse = {
+        error: string
+    }
+
+    type CreateRoomResponse = {
+        roomId: string,
+        secretId: string,
+        localGuestId: string
+    } | errorResponse
+
     type JoinRoomResponse = {
         isReaveled: boolean,
         roomName: string,
         deck: Deck,
         guests: Guests[],
-        error?: string,
         localGuestId: string,
-        currentRound: GameRound
-    }
+        currentRound: GameRound,
+        previousRounds: GameRound[],
+        localGuestId: string
+    } | errorResponse
+
+    type RejoinRoomResponse = JoinRoomResponse & {
+        localGuestName: string
+    } | errorResponse
 
     type CreateRoomProps = {
         deck: Deck,
@@ -36,6 +51,11 @@ declare global {
 
     type JoinRoomProps = {
         guestName: string,
+        roomId: string
+    }
+
+    type RejoinRoomProps = {
+        secretId: string
         roomId: string
     }
 

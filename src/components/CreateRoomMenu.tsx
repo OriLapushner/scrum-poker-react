@@ -49,6 +49,7 @@ export default function CreateGameMenu() {
 		}));
 	};
 
+	// this use effect is because decks are coming from local storage
 	useEffect(() => {
 		setDecks(allDecks);
 	}, [allDecks]);

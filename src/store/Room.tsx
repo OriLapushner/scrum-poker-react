@@ -5,7 +5,7 @@ import { create } from 'zustand';
 import io, { Socket } from 'socket.io-client';
 
 const SERVER_ADDRESS = process.env.NEXT_PUBLIC_SERVER_ADDRESS
-
+const LOCAL_STORAGE_TIME_LIMIT = 1000 * 60 * 60 * 1
 interface RoomState {
     roomName: string;
     socket: Socket | null;
@@ -21,7 +21,6 @@ interface RoomState {
 
 interface RoomStore extends RoomState {
     // Setter actions
-    addRemoteGuest: (guest: Guest) => void;
     removeRemoteGuest: (guestId: string) => void;
     setCurrentRoundVote: (vote: Vote) => void;
     setNewRoundState: () => void;
@@ -50,7 +49,8 @@ interface RoomStore extends RoomState {
     // Complex actions
     saveIdToLocalStorage: (secretId: string) => void;
     create: (payload: CreateRoomProps) => Promise<string>;
-    join: (payload: JoinRoomProps) => void;
+    join: (payload: JoinRoomProps) => Promise<void>
+    rejoinRoom: (payload: RejoinRoomProps) => Promise<void>;
     leaveRoom: () => void;
     vote: (value: number | null) => void;
     revealCards: () => void;
@@ -74,12 +74,11 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
     ...INITIAL_STATE,
 
     // Setter actions
-    addRemoteGuest: (guest) => set((state) => ({
-        remoteGuests: [...state.remoteGuests, guest]
-    })),
+
     removeRemoteGuest: (guestId) => set((state) => ({
         remoteGuests: state.remoteGuests.filter(guest => guest.id !== guestId)
     })),
+
     setCurrentRoundVote: (vote) => set((state) => {
         const currentRound = state.currentRound.filter(v => v.guestId !== vote.guestId);
         currentRound.push(vote);
@@ -99,7 +98,12 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
 
     // Event handlers
     handleGuestJoined: (guest: Guest) => {
-        get().addRemoteGuest(guest);
+        const state = get();
+        const objToSet: Partial<RoomState> = { remoteGuests: [...state.remoteGuests, guest] };
+        if (guest.isInRound) {
+            objToSet.currentRound = [...state.currentRound, { guestId: guest.id, voteValue: null }];
+        }
+        set(objToSet);
     },
 
     handleGuestLeft: (guestId: string) => {
@@ -139,21 +143,27 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
         return new Promise((resolve, reject) => {
             const socket = io(SERVER_ADDRESS, { timeout: 5000 });
             const state = get();
+
             set({
-                socket,
-                deck: payload.deck,
-                roomName: payload.roomName,
-                localGuest: { ...state.localGuest, name: payload.guestName, isInRound: true }
+                socket
             });
 
-            if (!state.socket) {
-                socket.on('connect', () => {
+            socket.emit('create_room', payload, (response: CreateRoomResponse) => {
+                if ("error" in response) {
+                    reject(new Error(`Create room failed: ${response.error}`));
+                    return;
+                }
+                set({
+                    roomId: response.roomId,
+                    deck: payload.deck,
+                    roomName: payload.roomName,
+                    secretId: response.secretId,
+                    localGuest: { ...state.localGuest, id: response.localGuestId, isInRound: true, name: payload.guestName },
+                    currentRound: [{ guestId: response.localGuestId, voteValue: null }]
                 });
-            }
 
-            socket.emit('create_room', payload, (response: string) => {
-                set({ roomId: response });
-                resolve(response);
+                console.log('room created', response);
+                resolve(response.roomId);
             });
 
             socket.on('connect_error', (error) => {
@@ -164,7 +174,7 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
         });
     },
 
-    join: (payload: JoinRoomProps): Promise<void> => {
+    join: (payload: JoinRoomProps) => {
         return new Promise((resolve, reject) => {
             const socket = io(SERVER_ADDRESS);
             const state = get();
@@ -174,11 +184,46 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
                 reject(new Error(`Connection failed: ${error.message}`));
             });
 
-            socket.on('connect', () => {
-            });
             socket.emit('join_room', { ...payload }, (response: JoinRoomResponse) => {
-                if (response.error) {
+                if ("error" in response) {
                     reject(new Error(`Join room failed: ${response.error}`));
+                    return;
+                }
+                console.log('current round', response.currentRound);
+
+                set({
+                    isRevealed: response.isReaveled,
+                    roomName: response.roomName,
+                    deck: response.deck,
+                    remoteGuests: response.guests,
+                    currentRound: response.currentRound,
+                    roomId: payload.roomId,
+                    localGuest: {
+                        ...state.localGuest,
+                        name: payload.guestName,
+                        isInRound: !response.isReaveled,
+                        id: response.localGuestId
+                    },
+                    previousRounds: response.previousRounds
+                });
+
+                get().subscribeToEvents(socket);
+                resolve();
+            });
+        });
+    },
+
+    rejoinRoom: (payload: RejoinRoomProps) => {
+        return new Promise((resolve, reject) => {
+            const state = get();
+            const socket = io(SERVER_ADDRESS);
+            set({ socket });
+            socket.on('connect_error', (error) => {
+                reject(new Error(`Connection failed: ${error.message}`));
+            });
+            socket.emit('rejoin_room', payload, (response: RejoinRoomResponse) => {
+                if ("error" in response) {
+                    reject(new Error(`Rejoin room failed: ${response.error}`));
                     return;
                 }
                 set({
@@ -188,12 +233,12 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
                     remoteGuests: response.guests,
                     currentRound: response.currentRound,
                     roomId: payload.roomId,
-                    localGuest: { ...state.localGuest, name: payload.guestName, isInRound: !response.isReaveled }
+                    localGuest: { ...state.localGuest, name: response.localGuestName, isInRound: !response.isReaveled }
                 });
                 get().subscribeToEvents(socket);
                 resolve();
             });
-        });
+        })
     },
 
     leaveRoom: () => {
@@ -207,7 +252,11 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
     vote: (payload: VoteValue) => {
         const state = get();
         const localGuestId = state.localGuest.id;
-
+        const newCurrentRound = [
+            ...state.currentRound.filter(vote => vote.guestId !== localGuestId),
+            { voteValue: payload, guestId: localGuestId }
+        ]
+        console.log('new current round', newCurrentRound);
         set((state) => ({
             currentRound: [
                 ...state.currentRound.filter(vote => vote.guestId !== localGuestId),
@@ -266,7 +315,7 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
     getSecretIdFromLocalStorage: (roomId) => {
         const state = get();
         const rooms = state.getRoomsFromLocalStorage();
-        const timeLimit = Date.now() - 1000 * 60 * 60 * 1;
+        const timeLimit = Date.now() - LOCAL_STORAGE_TIME_LIMIT;
         const filteredRooms = rooms?.filter(room => room.timeStamp > timeLimit);
         localStorage.setItem('rooms', JSON.stringify(filteredRooms));
         const roomData = filteredRooms?.find(room => room.roomId === roomId);
@@ -297,7 +346,7 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
             const card = state.deck.cards[vote?.voteValue ?? 0];
             return {
                 guest,
-                cardValue: !vote?.voteValue ? null : card.value,
+                cardValue: vote?.voteValue === null ? null : card.value,
                 displayName: card.displayName
             };
         });
