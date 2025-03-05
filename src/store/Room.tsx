@@ -31,6 +31,8 @@ interface RoomStore extends RoomState {
     getAllGuests: () => Guest[];
     getVotingGuests: () => Guest[];
     getVotesState: () => VotesState;
+    getVotesStateFromRound: (round: GameRound) => VotesState;
+    getVotesStateForPreviousRound: (roundIndex: number) => VotesState;
     getLocalGuestVoteValue: () => VoteValue;
     getIsReadyToReveal: () => boolean;
     getResultFromRound: (round: GameRound, cards: Card[]) => GameRoundResult;
@@ -341,15 +343,36 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
 
     getVotesState: () => {
         const state = get();
-        return state.getVotingGuests().map(guest => {
-            const vote = state.currentRound.find(vote => vote.guestId === guest.id);
-            const card = state.deck.cards[vote?.voteValue ?? 0];
+        return state.getVotesStateFromRound(state.currentRound);
+    },
+
+    getVotesStateFromRound: (round: GameRound) => {
+        const state = get();
+        const allGuests = state.getAllGuests();
+
+        return round.map(vote => {
+            const guest = allGuests.find(g => g.id === vote.guestId) || {
+                id: vote.guestId,
+                name: 'Unknown Guest',
+                isConnected: false,
+                isInRound: false
+            };
+
+            const card = state.deck.cards[vote.voteValue ?? 0];
             return {
                 guest,
                 cardValue: vote?.voteValue === null ? null : card.value,
                 displayName: card.displayName
             };
         });
+    },
+
+    getVotesStateForPreviousRound: (roundIndex: number) => {
+        const state = get();
+        const round = state.previousRounds[roundIndex];
+        if (!round) return [];
+
+        return state.getVotesStateFromRound(round);
     },
 
     getResultFromRound: (round: GameRound, cards: Card[]) => {
@@ -378,5 +401,5 @@ export const useRoomStore = create<RoomStore>()((set, get) => ({
         return state.previousRounds.map(round => {
             return state.getResultFromRound(round, state.deck.cards);
         })
-    }
+    },
 }));

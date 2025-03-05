@@ -16,6 +16,9 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 	const [flippedCards, setFlippedCards] = useState<{ [key: string]: boolean }>({});
 
 	useEffect(() => {
+		// Reset flipped cards state when votes change
+		setFlippedCards({});
+
 		if (isRevealed) {
 			votes.forEach((vote, index) => {
 				setTimeout(() => {
@@ -25,8 +28,6 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 					}));
 				}, index * 200);
 			});
-		} else {
-			setFlippedCards({});
 		}
 	}, [isRevealed, votes]);
 
@@ -34,20 +35,20 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 		<Card
 			className={`w-full h-full flex items-center justify-center transition-all duration-200 
             ${value !== null
-					? 'bg-blue-100 shadow-lg ring-2 ring-blue-400'
-					: 'bg-gray-50 hover:bg-gray-100'}`}
+					? 'bg-blue-50 shadow-sm border-blue-200'
+					: 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}
 		>
 			{value !== null ? (
 				<span className="text-blue-600 font-bold text-lg">✓</span>
 			) : (
-				<span className="text-gray-400 text-sm">pending</span>
+				<span className="text-slate-400 text-sm">pending</span>
 			)}
 		</Card>
 	);
 
 	const renderBackContent = (displayName: string | null) => (
 		<Card
-			className="w-full h-full flex items-center justify-center bg-blue-500 text-white"
+			className="w-full h-full flex items-center justify-center bg-blue-600 text-white border-blue-700 shadow-md"
 		>
 			<span className="font-bold text-2xl">
 				{displayName ?? '?'}
@@ -68,7 +69,7 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 							height="h-24"
 							className="max-w-16"
 						/>
-						<span className="text-sm font-medium text-gray-700 truncate max-w-full px-2">
+						<span className="text-sm font-medium text-slate-700 truncate max-w-full px-2">
 							{guest.name}
 						</span>
 					</div>
@@ -76,19 +77,18 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 			</div>
 
 			<div className="flex flex-col items-center space-y-4">
-
 				{!isRevealed && (
-					<Badge className="px-5 py-2 text-sm font-semibold bg-slate-600 text-gray-200" variant="outline">
+					<Badge className="px-5 py-2 text-sm font-semibold bg-slate-100 text-slate-700 border border-slate-200" variant="outline">
 						<span>{`${votedCount} / ${totalVotes} votes`}</span>
 					</Badge>
 				)}
 
 				{isRevealed && (
 					<>
-						<Separator className="my-2" />
-						<Card className="px-6 py-3">
+						<Separator className="my-2 bg-slate-200" />
+						<Card className="px-8 py-4 border-blue-200 shadow-sm">
 							<div className="flex items-baseline gap-2">
-								<span className="text-sm text-gray-500">Average:</span>
+								<span className="text-sm text-slate-500">Average:</span>
 								<span className="text-2xl font-bold text-blue-600">
 									{currentRoundResult.result}
 								</span>
