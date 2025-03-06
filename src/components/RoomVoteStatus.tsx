@@ -16,7 +16,6 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 	const [flippedCards, setFlippedCards] = useState<{ [key: string]: boolean }>({});
 
 	useEffect(() => {
-		// Reset flipped cards state when votes change
 		setFlippedCards({});
 
 		if (isRevealed) {
@@ -50,26 +49,26 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 		<Card
 			className="w-full h-full flex items-center justify-center bg-blue-600 text-white border-blue-700 shadow-md"
 		>
-			<span className="font-bold text-2xl">
+			<span className="font-bold text-xl md:text-2xl">
 				{displayName ?? '?'}
 			</span>
 		</Card>
 	);
 
 	return (
-		<div className="space-y-6 w-full max-w-lg">
-			<div className="grid grid-cols-3 gap-4 place-items-center">
+		<div className="space-y-4 md:space-y-6 w-full max-w-lg">
+			<div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-4 place-items-center">
 				{votes.map(({ guest, cardValue, displayName }) => (
 					<div key={guest.id} className="w-full flex flex-col items-center space-y-2">
 						<FlippableCard
 							frontContent={renderFrontContent(cardValue)}
 							backContent={renderBackContent(displayName)}
 							isFlipped={flippedCards[guest.id] ?? false}
-							width="w-16"
-							height="h-24"
-							className="max-w-16"
+							width="w-14 md:w-16"
+							height="h-20 md:h-24"
+							className="max-w-14 md:max-w-16"
 						/>
-						<span className="text-sm font-medium text-slate-700 truncate max-w-full px-2">
+						<span className="text-xs md:text-sm font-medium text-slate-700 truncate max-w-full px-2">
 							{guest.name}
 						</span>
 					</div>
@@ -78,7 +77,7 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 
 			<div className="flex flex-col items-center space-y-4">
 				{!isRevealed && (
-					<Badge className="px-5 py-2 text-sm font-semibold bg-slate-100 text-slate-700 border border-slate-200" variant="outline">
+					<Badge className="px-4 md:px-5 py-1.5 md:py-2 text-sm font-semibold bg-slate-100 text-slate-700 border border-slate-200" variant="outline">
 						<span>{`${votedCount} / ${totalVotes} votes`}</span>
 					</Badge>
 				)}
@@ -86,10 +85,10 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 				{isRevealed && (
 					<>
 						<Separator className="my-2 bg-slate-200" />
-						<Card className="px-8 py-4 border-blue-200 shadow-sm">
+						<Card className="px-6 md:px-8 py-3 md:py-4 border-blue-200 shadow-sm">
 							<div className="flex items-baseline gap-2">
 								<span className="text-sm text-slate-500">Average:</span>
-								<span className="text-2xl font-bold text-blue-600">
+								<span className="text-xl md:text-2xl font-bold text-blue-600">
 									{currentRoundResult.result}
 								</span>
 							</div>
