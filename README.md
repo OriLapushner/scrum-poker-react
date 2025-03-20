@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Scrum Poker React
 
-## Getting Started
+A real-time planning poker application built with React, Next.js, and Socket.IO for agile teams to facilitate story point estimation sessions.
 
-First, run the development server:
+**🌐 Live at: [scrum-poker.site](scrum-poker.site)**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Real-time Collaboration**: Seamless voting experience with instant updates across all participants
+- **Create Your Own Deck**: Choose from premade decks or make your own deck to fit your team's need.
+- **Easy to Use**: No complex setup required - create a room, share the link, and start estimating
+- **Vote History**: Keep track of previously estimated items for future reference
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📋 Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Frontend**: React 19, Next.js 15, TypeScript
+- **State Management**: Zustand
+- **UI Components**: Shadcn with Tailwind CSS
+- **Real-time Communication**: Socket.IO
 
-## Learn More
+## 🔒 Backend
 
-To learn more about Next.js, take a look at the following resources:
+This repository contains only the frontend code for the Scrum Poker application. The backend code is closed-source and maintained separately. The frontend communicates with the backend via Socket.IO for real-time updates.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Setup & Development
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Prerequisites
 
-## Deploy on Vercel
+- Node.js 18+ and npm/yarn
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📝 Usage
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Create a new room with your preferred estimation deck
+2. Share the room link with your team members
+3. Vote on stories as they are discussed
+4. Reveal the votes when everyone has voted
+5. Start a new round for the next story
