@@ -6,6 +6,7 @@ import { AlertCircle } from 'lucide-react';
 import { RoomVoteStatus } from './RoomVoteStatus';
 import { RoomGuestList } from './RoomGuestList';
 import { RoomRoundsHistory } from './RoomRoundsHistory';
+import { useState } from 'react';
 
 interface MobileRoomLayoutProps {
 	isViewingHistory: boolean;
@@ -36,9 +37,20 @@ export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 	setSelectedRoundIndex,
 	handleRoundSelect
 }) => {
+	const [activeTab, setActiveTab] = useState("game");
+
+	const handleTabChange = (value: string) => {
+		setActiveTab(value);
+	};
+
+	const handleRoundSelected = (index: number) => {
+		handleRoundSelect(index);
+		setActiveTab("game");
+	};
+
 	return (
 		<div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-			<Tabs defaultValue="game" className="w-full flex-1 flex flex-col">
+			<Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex-1 flex flex-col">
 				<TabsList className="w-full mb-4 flex-shrink-0">
 					<TabsTrigger value="game" className="flex-1">Game</TabsTrigger>
 					<TabsTrigger value="participants" className="flex-1">Participants</TabsTrigger>
@@ -110,7 +122,7 @@ export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 					<RoomRoundsHistory
 						gameRounds={previousRoundsResults}
 						selectedRoundIndex={selectedRoundIndex}
-						onRoundSelect={handleRoundSelect}
+						onRoundSelect={handleRoundSelected}
 					/>
 				</TabsContent>
 			</Tabs>
