@@ -91,7 +91,7 @@ export default function CreateGameMenu() {
 	}, [allDecks]);
 
 	return (
-		<Card className="w-full">
+		<Card className="w-full bg-white z-10 shadow-lg">
 			<CardHeader>
 				<CardTitle className="text-2xl font-bold">Create New Room</CardTitle>
 				<CardDescription>
