@@ -18,27 +18,56 @@ interface FormData {
 	deckId: string;
 }
 
+interface FormErrors {
+	roomName?: string;
+	guestName?: string;
+}
+
 export default function CreateGameMenu() {
 	const createRoom = useRoomStore(state => state.create);
 	const allDecks = useDecksManagerStore(state => state.getAllDecks(), shallow);
 	const router = useRouter();
 	const [isEditorOpen, setIsEditorOpen] = useState(false);
 	const [decks, setDecks] = useState<Deck[]>([]);
+	const [errors, setErrors] = useState<FormErrors>({});
 
 	const [formData, setFormData] = useState<FormData>({
 		roomName: '',
 		guestName: '',
-		deckId: allDecks.length > 0 ? allDecks[0].name : '' // Default to first deck if a\ailable
+		deckId: allDecks.length > 0 ? allDecks[0].name : ''
 	});
 
+	const validateForm = (): boolean => {
+		const newErrors: FormErrors = {};
+		let isValid = true;
+
+		if (!formData.roomName.trim()) {
+			newErrors.roomName = 'Room name is required';
+			isValid = false;
+		}
+
+		if (!formData.guestName.trim()) {
+			newErrors.guestName = 'Guest name is required';
+			isValid = false;
+		}
+
+		setErrors(newErrors);
+		return isValid;
+	};
+
 	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+
+		if (!validateForm()) {
+			return;
+		}
+
 		const roomId = await createRoom({
 			roomName: formData.roomName,
 			guestName: formData.guestName,
 			deck: allDecks.find(deck => deck.name === formData.deckId)!
 		});
 		router.push(`/room/${roomId}`);
-		e.preventDefault();
 	};
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -47,6 +76,13 @@ export default function CreateGameMenu() {
 			...prev,
 			[name]: value
 		}));
+
+		if (errors[name as keyof FormErrors]) {
+			setErrors(prev => ({
+				...prev,
+				[name]: undefined
+			}));
+		}
 	};
 
 	// this use effect is because decks are coming from local storage
@@ -79,6 +115,9 @@ export default function CreateGameMenu() {
 							/>
 							<NotebookText className="absolute left-2.5 top-2 h-5 w-5 text-primary-600" />
 						</div>
+						{errors.roomName && (
+							<p className="text-sm text-destructive mt-1">{errors.roomName}</p>
+						)}
 					</div>
 
 					<div className="space-y-2">
@@ -95,6 +134,9 @@ export default function CreateGameMenu() {
 							/>
 							<Users className="absolute left-2.5 top-2 h-5 w-5 text-primary-600" />
 						</div>
+						{errors.guestName && (
+							<p className="text-sm text-destructive mt-1">{errors.guestName}</p>
+						)}
 					</div>
 
 					<div className="space-y-2">
