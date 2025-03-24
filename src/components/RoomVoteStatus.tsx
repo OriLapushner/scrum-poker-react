@@ -34,7 +34,7 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 		<Card
 			className={`w-full h-full flex items-center justify-center transition-all duration-200 
             ${value !== null
-					? 'bg-secondary-50 shadow-sm border-primary-200'
+					? 'bg-primary-100/80 shadow-sm border-primary-300'
 					: 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}
 		>
 			{value !== null ? (
@@ -85,7 +85,7 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 				{isRevealed && (
 					<>
 						<Separator className="my-2 bg-slate-200" />
-						<Card className="px-6 md:px-8 py-3 md:py-4 border-primary-200 shadow-sm">
+						<Card className="px-6 md:px-8 py-3 md:py-4 border-primary-300 shadow-sm">
 							<div className="flex items-baseline gap-2">
 								<span className="text-sm text-slate-500">Average:</span>
 								<span className="text-xl md:text-2xl font-bold text-primary-600">
