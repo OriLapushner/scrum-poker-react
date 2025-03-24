@@ -96,7 +96,7 @@ export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 						{!isViewingHistory && !isRevealed && (
 							<PulsatingButton
 								onClick={handleRevealCardClicked}
-								className="bg-blue-600 hover:bg-blue-700 mt-4"
+								className="bg-primary-600 hover:bg-primary-700 mt-4"
 								disabled={!isReadyToReveal}
 								isPulsating={isReadyToReveal}
 							>

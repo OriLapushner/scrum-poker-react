@@ -16,7 +16,7 @@ export function HeroSection() {
 						</p>
 						<a
 							href="#"
-							className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
+							className="mt-2 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
 						>
 							Learn more about Scrum Poker
 							<ArrowRight className="ml-2 h-4 w-4" />

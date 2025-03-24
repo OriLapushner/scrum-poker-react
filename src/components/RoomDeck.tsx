@@ -25,8 +25,8 @@ export const RoomDeck: React.FC<RoomDeckProps> = ({ deck, selectedCard, onCardCl
 							transition-all duration-200
 							mx-1.5 snap-center lg:mx-0
 							${selectedCard === index ?
-								'bg-blue-300 -translate-y-2 shadow-lg hover:bg-blue-400' :
-								'hover:bg-blue-200'
+								'bg-secondary-300 -translate-y-2 shadow-lg hover:bg-secondary-400' :
+								'hover:bg-primary-200'
 							}
 						`}
 					>

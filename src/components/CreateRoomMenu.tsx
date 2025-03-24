@@ -77,7 +77,7 @@ export default function CreateGameMenu() {
 								placeholder="Room Name"
 								required
 							/>
-							<NotebookText className="absolute left-2.5 top-2 h-5 w-5 text-gray-400" />
+							<NotebookText className="absolute left-2.5 top-2 h-5 w-5 text-primary-600" />
 						</div>
 					</div>
 
@@ -93,7 +93,7 @@ export default function CreateGameMenu() {
 								placeholder="Your Name"
 								required
 							/>
-							<Users className="absolute left-2.5 top-2 h-5 w-5 text-gray-400" />
+							<Users className="absolute left-2.5 top-2 h-5 w-5 text-primary-600" />
 						</div>
 					</div>
 
@@ -114,7 +114,7 @@ export default function CreateGameMenu() {
 									</option>
 								))}
 							</select>
-							<Diamond className="absolute left-2.5 top-2 h-5 w-5 text-gray-400" />
+							<Diamond className="absolute left-2.5 top-2 h-5 w-5 text-primary-600" />
 						</div>
 					</div>
 				</form>
@@ -134,7 +134,7 @@ export default function CreateGameMenu() {
 				</Dialog>
 				<Button
 					onClick={handleSubmit}
-					className="w-full bg-sky-600 hover:bg-sky-700"
+					className="w-full bg-primary-600 hover:bg-primary-700"
 				>
 					Create Room
 				</Button>

@@ -38,7 +38,7 @@ export const JoinRoomMenu = ({ onSubmit }: JoinRoomMenuProps) => {
 							required
 						/>
 					</div>
-					<Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium">
+					<Button type="submit" className="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium">
 						Join Room
 					</Button>
 				</form>

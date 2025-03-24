@@ -191,9 +191,10 @@ const ScrumPokerLayout = () => {
 						{!isViewingHistory && !isRevealed && (
 							<PulsatingButton
 								onClick={handleRevealCardClicked}
-								className="bg-blue-600 hover:bg-blue-700"
+								className="bg-primary-800 hover:bg-primary-900"
 								disabled={!isReadyToReveal}
 								isPulsating={isReadyToReveal}
+								pulseColor="#06b6d4"
 							>
 								Reveal Votes
 							</PulsatingButton>

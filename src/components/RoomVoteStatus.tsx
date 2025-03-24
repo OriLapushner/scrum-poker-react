@@ -34,11 +34,11 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 		<Card
 			className={`w-full h-full flex items-center justify-center transition-all duration-200 
             ${value !== null
-					? 'bg-blue-50 shadow-sm border-blue-200'
+					? 'bg-secondary-50 shadow-sm border-primary-200'
 					: 'bg-slate-50 border-slate-200 hover:bg-slate-100'}`}
 		>
 			{value !== null ? (
-				<span className="text-blue-600 font-bold text-lg">✓</span>
+				<span className="text-primary-600 font-bold text-lg">✓</span>
 			) : (
 				<span className="text-slate-400 text-sm">pending</span>
 			)}
@@ -47,7 +47,7 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 
 	const renderBackContent = (displayName: string | null) => (
 		<Card
-			className="w-full h-full flex items-center justify-center bg-blue-600 text-white border-blue-700 shadow-md"
+			className="w-full h-full flex items-center justify-center bg-primary-600 text-white border-primary-700 shadow-md"
 		>
 			<span className="font-bold text-xl md:text-2xl">
 				{displayName ?? '?'}
@@ -85,10 +85,10 @@ export function RoomVoteStatus({ votes, isRevealed, currentRoundResult }: RoomVo
 				{isRevealed && (
 					<>
 						<Separator className="my-2 bg-slate-200" />
-						<Card className="px-6 md:px-8 py-3 md:py-4 border-blue-200 shadow-sm">
+						<Card className="px-6 md:px-8 py-3 md:py-4 border-primary-200 shadow-sm">
 							<div className="flex items-baseline gap-2">
 								<span className="text-sm text-slate-500">Average:</span>
-								<span className="text-xl md:text-2xl font-bold text-blue-600">
+								<span className="text-xl md:text-2xl font-bold text-primary-600">
 									{currentRoundResult.result}
 								</span>
 							</div>
