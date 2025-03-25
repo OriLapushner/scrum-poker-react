@@ -149,6 +149,7 @@ export const useRoomStore = create<RoomStore>()(
             return new Promise((resolve, reject) => {
                 const socket = io(SERVER_ADDRESS, { timeout: 5000 });
                 const state = get();
+                set(INITIAL_STATE);
 
                 set({
                     socket
@@ -165,8 +166,6 @@ export const useRoomStore = create<RoomStore>()(
                         roomName: payload.roomName,
                         secretId: response.secretId,
                         localGuest: { ...state.localGuest, id: response.localGuestId, isInRound: true, name: payload.guestName },
-                        previousRounds: [],
-                        remoteGuests: [],
                         currentRound: [{ guestId: response.localGuestId, voteValue: null }]
                     });
 
