@@ -70,10 +70,9 @@ export function ScrumPokerExplanationSection() {
 						</div>
 					</div>
 
-					{/* Benefits section */}
 					<div className="border-t-2 border-primary-600 pt-4">
 						<h3 className="text-lg font-semibold text-primary-700 mb-3 text-center">Benefits of Scrum Poker</h3>
-						<p className="text-sm text-gray-600 mb-4">
+						<p className="text-gray-600 mb-4">
 							Scrum Poker improves estimation accuracy and team collaboration through structured consensus
 							building, allowing development teams to leverage diverse perspectives and reduce individual biases
 						</p>
