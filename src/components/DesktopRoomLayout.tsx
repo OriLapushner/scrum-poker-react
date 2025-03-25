@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { PulsatingButton } from "@/components/magicui/pulsating-button";
 import { RoomGuestList } from '@/components/RoomGuestList';
 import { RoomRoundsHistory } from '@/components/RoomRoundsHistory';
-import { RoomVoteStatus } from '@/components/RoomVoteStatus';
+import { RoomTable } from '@/components/RoomTable';
 import { AlertCircle } from 'lucide-react';
 
 interface DesktopRoomLayoutProps {
@@ -72,7 +72,7 @@ export const DesktopRoomLayout = ({
 					</div>
 				)}
 
-				<RoomVoteStatus
+				<RoomTable
 					votes={displayedVotes}
 					isRevealed={isViewingHistory ? true : isRevealed}
 					currentRoundResult={displayedResults || { result: 0 }}

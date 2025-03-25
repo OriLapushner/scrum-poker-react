@@ -17,7 +17,7 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 const ScrumPokerLayout = () => {
 	const router = useRouter();
 	const { toast } = useToast();
-	const [selectedRoundIndex, setSelectedRoundIndex] = useState<number | null>(null);
+	const [historySelectedRoundIndex, setHistorySelectedRoundIndex] = useState<number | null>(null);
 
 	const deck = useRoomStore(state => state.deck);
 	const roomName = useRoomStore(state => state.roomName);
@@ -31,7 +31,7 @@ const ScrumPokerLayout = () => {
 	const votesState = useRoomStore(state => state.getVotesState());
 	const localGuestVoteValue = useRoomStore(state => state.getLocalGuestVoteValue());
 	const getVotesStateForRound = useRoomStore(state => state.getVotesStateForPreviousRound);
-
+	const isVotingDisabled = useRoomStore(state => state.getIsVotingDisabled());
 	const vote = useRoomStore(state => state.vote);
 	const joinRoom = useRoomStore(state => state.join);
 	const revealCards = useRoomStore(state => state.revealCards);
@@ -44,15 +44,15 @@ const ScrumPokerLayout = () => {
 	const roomLink = `${protocol}://${domain}/room/${roomId}`;
 
 	// Determine which votes to display based on selection
-	const displayedVotes = selectedRoundIndex !== null
-		? getVotesStateForRound(selectedRoundIndex)
+	const displayedVotes = historySelectedRoundIndex !== null
+		? getVotesStateForRound(historySelectedRoundIndex)
 		: votesState;
 
-	const displayedResults = selectedRoundIndex !== null
-		? previousRoundsResults[selectedRoundIndex]
+	const displayedResults = historySelectedRoundIndex !== null
+		? previousRoundsResults[historySelectedRoundIndex]
 		: currentRoundResults;
 
-	const isViewingHistory = selectedRoundIndex !== null;
+	const isViewingHistory = historySelectedRoundIndex !== null;
 	const isMobile = useMediaQuery('(max-width: 1023px)');
 
 	const handleRevealCardClicked = async () => {
@@ -91,16 +91,16 @@ const ScrumPokerLayout = () => {
 
 	const handleRoundSelect = (index: number) => {
 		// If already selected, deselect it (toggle behavior)
-		if (selectedRoundIndex === index) {
-			setSelectedRoundIndex(null);
+		if (historySelectedRoundIndex === index) {
+			setHistorySelectedRoundIndex(null);
 		} else {
-			setSelectedRoundIndex(index);
+			setHistorySelectedRoundIndex(index);
 		}
 	};
 
 	const handleStartNewRound = () => {
 		// Reset selected round when starting a new round
-		setSelectedRoundIndex(null);
+		setHistorySelectedRoundIndex(null);
 		startNewRound();
 	};
 
@@ -125,7 +125,7 @@ const ScrumPokerLayout = () => {
 			{isMobile ? (
 				<MobileRoomLayout
 					isViewingHistory={isViewingHistory}
-					selectedRoundIndex={selectedRoundIndex}
+					selectedRoundIndex={historySelectedRoundIndex}
 					displayedVotes={displayedVotes}
 					isRevealed={isRevealed}
 					displayedResults={displayedResults}
@@ -134,13 +134,13 @@ const ScrumPokerLayout = () => {
 					previousRoundsResults={previousRoundsResults}
 					handleRevealCardClicked={handleRevealCardClicked}
 					handleStartNewRound={handleStartNewRound}
-					setSelectedRoundIndex={setSelectedRoundIndex}
+					setSelectedRoundIndex={setHistorySelectedRoundIndex}
 					handleRoundSelect={handleRoundSelect}
 				/>
 			) : (
 				<DesktopRoomLayout
 					isViewingHistory={isViewingHistory}
-					selectedRoundIndex={selectedRoundIndex}
+					selectedRoundIndex={historySelectedRoundIndex}
 					displayedVotes={displayedVotes}
 					isRevealed={isRevealed}
 					displayedResults={displayedResults}
@@ -149,14 +149,14 @@ const ScrumPokerLayout = () => {
 					previousRoundsResults={previousRoundsResults}
 					handleRevealCardClicked={handleRevealCardClicked}
 					handleStartNewRound={handleStartNewRound}
-					setSelectedRoundIndex={setSelectedRoundIndex}
+					setSelectedRoundIndex={setHistorySelectedRoundIndex}
 					handleRoundSelect={handleRoundSelect}
 				/>
 			)}
 
 			<div className="z-10">
 				<ScrollArea className="w-full overflow-x-auto">
-					<RoomDeck deck={deck} selectedCard={localGuestVoteValue} onCardClicked={handleCardClicked} />
+					<RoomDeck isDisabled={isVotingDisabled} deck={deck} selectedCard={localGuestVoteValue} onCardClicked={handleCardClicked} />
 					<ScrollBar orientation="horizontal" />
 				</ScrollArea>
 			</div>

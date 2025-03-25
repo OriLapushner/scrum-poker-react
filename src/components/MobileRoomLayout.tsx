@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PulsatingButton } from "@/components/magicui/pulsating-button";
 import { AlertCircle } from 'lucide-react';
-import { RoomVoteStatus } from './RoomVoteStatus';
+import { RoomTable } from './RoomTable';
 import { RoomGuestList } from './RoomGuestList';
 import { RoomRoundsHistory } from './RoomRoundsHistory';
 import { useState } from 'react';
@@ -87,7 +87,7 @@ export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 							</div>
 						)}
 
-						<RoomVoteStatus
+						<RoomTable
 							votes={displayedVotes}
 							isRevealed={isViewingHistory ? true : isRevealed}
 							currentRoundResult={displayedResults || { result: 0 }}
