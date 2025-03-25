@@ -1,10 +1,12 @@
 "use client"
 import { Clock, Users, Settings } from "lucide-react"
+import { Section } from "@/components/ui/section"
+import { Container } from "@/components/ui/container"
 
 export function FeaturesSection() {
 	return (
-		<section id="features" className="py-12 md:py-24 bg-gray-50 scroll-mt-16">
-			<div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+		<Section id="features" className="bg-gray-50">
+			<Container>
 				<div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
 					<h2 className="text-3xl font-bold leading-tight tracking-tighter text-gray-900 md:text-4xl">
 						Features That Make Estimation Easy
@@ -13,7 +15,7 @@ export function FeaturesSection() {
 						Our Scrum Poker application is designed to make your estimation sessions smooth and productive.
 					</p>
 				</div>
-				<div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3 md:gap-12 lg:gap-16 mt-12">
+				<div className="mx-auto grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-12 lg:gap-16 mt-12">
 					<div className="flex flex-col items-center text-center">
 						<div className="mb-4 rounded-full bg-primary-100 p-4">
 							<Clock className="h-8 w-8 text-primary-600" />
@@ -44,7 +46,7 @@ export function FeaturesSection() {
 						</p>
 					</div>
 				</div>
-			</div>
-		</section>
+			</Container>
+		</Section>
 	)
 } 

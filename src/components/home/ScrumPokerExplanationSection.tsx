@@ -1,4 +1,5 @@
-"use client"
+import { Section } from "@/components/ui/section"
+import { Container } from "@/components/ui/container"
 
 export function ScrumPokerExplanationSection() {
 	const howItWorksSteps = [
@@ -40,8 +41,8 @@ export function ScrumPokerExplanationSection() {
 	];
 
 	return (
-		<section id="how-it-works" className="bg-white py-8 md:py-24 mt-auto scroll-mt-16">
-			<div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
+		<Section id="how-it-works">
+			<Container>
 				<div className="mx-auto text-center mb-6">
 					<h2 className="text-3xl font-bold text-primary-700 md:text-3xl">Understanding Scrum Poker</h2>
 					<p className="mt-2 text-gray-600 max-w-3xl mx-auto">
@@ -52,8 +53,8 @@ export function ScrumPokerExplanationSection() {
 
 				<div className="space-y-6">
 					<div className="border-t-2 border-primary-600 pt-4">
-						<h3 className="text-lg font-semibold text-primary-700 mb-3 text-center">How It Works</h3>
-						<p className="text-gray-600 mb-4">
+						<h3 className="text-xl font-semibold text-primary-700 mb-3 text-center">How It Works</h3>
+						<p className="text-gray-600 mb-4 lg:mb-6">
 							Scrum Poker uses cards with numbers that represent story points or effort. Team members select cards
 							simultaneously to prevent anchoring bias, then discuss differences to reach consensus.
 						</p>
@@ -71,8 +72,8 @@ export function ScrumPokerExplanationSection() {
 					</div>
 
 					<div className="border-t-2 border-primary-600 pt-4">
-						<h3 className="text-lg font-semibold text-primary-700 mb-3 text-center">Benefits of Scrum Poker</h3>
-						<p className="text-gray-600 mb-4">
+						<h3 className="text-xl font-semibold text-primary-700 mb-3 text-center">Benefits of Scrum Poker</h3>
+						<p className="text-gray-600 mb-4 lg:mb-6">
 							Scrum Poker improves estimation accuracy and team collaboration through structured consensus
 							building, allowing development teams to leverage diverse perspectives and reduce individual biases
 						</p>
@@ -89,8 +90,8 @@ export function ScrumPokerExplanationSection() {
 						</div>
 					</div>
 				</div>
-			</div>
-		</section>
+			</Container>
+		</Section>
 	)
 }
 
