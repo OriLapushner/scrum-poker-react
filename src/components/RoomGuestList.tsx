@@ -2,19 +2,19 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Eye, UserCheck } from "lucide-react";
-
-type GuestListProps = {
+import { cn } from '@/lib/utils';
+interface GuestListProps extends React.HTMLAttributes<HTMLDivElement> {
 	guests: Guest[];
 };
 
-export const RoomGuestList = ({ guests }: GuestListProps) => {
+export const RoomGuestList = ({ guests, className, ...props }: GuestListProps) => {
 	return (
-		<Card>
+		<Card className={cn("border-slate-200 shadow-sm", className)} {...props}>
 			<CardHeader className="pb-2 md:pb-3">
 				<CardTitle className="text-base md:text-lg font-medium">Participants</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<ScrollArea className="h-60 md:h-72 pr-2 md:pr-4">
+				<ScrollArea className="h-60 md:h-72 px-2">
 					<div className="space-y-1">
 						{guests.map((guest) => (
 							<div

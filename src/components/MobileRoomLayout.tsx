@@ -58,7 +58,7 @@ export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 				</TabsList>
 
 				<TabsContent value="game" className="flex-1 flex flex-col min-h-0 mt-0">
-					<div className="flex-grow flex flex-col items-center justify-center space-y-4 pb-4">
+					<div className="flex-grow flex flex-col items-center space-y-4 pb-4">
 						{isViewingHistory && (
 							<div className="w-full max-w-md mb-4">
 								<Alert className="bg-amber-50 border border-amber-200 shadow-sm">
@@ -88,6 +88,7 @@ export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 						)}
 
 						<RoomTable
+							className='w-full'
 							votes={displayedVotes}
 							isRevealed={isViewingHistory ? true : isRevealed}
 							currentRoundResult={displayedResults || { result: 0 }}
@@ -96,7 +97,7 @@ export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 						{!isViewingHistory && !isRevealed && (
 							<PulsatingButton
 								onClick={handleRevealCardClicked}
-								className="bg-primary-600 hover:bg-primary-700 mt-4"
+								className="bg-primary-800 hover:bg-primary-900 mt-4 w-28"
 								disabled={!isReadyToReveal}
 								isPulsating={isReadyToReveal}
 							>

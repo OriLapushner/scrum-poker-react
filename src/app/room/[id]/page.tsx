@@ -154,7 +154,7 @@ const ScrumPokerLayout = () => {
 				/>
 			)}
 
-			<div className="z-10">
+			<div className="z-10 absolute bottom-0 left-0 right-0">
 				<ScrollArea className="w-full overflow-x-auto">
 					<RoomDeck isDisabled={isVotingDisabled} deck={deck} selectedCard={localGuestVoteValue} onCardClicked={handleCardClicked} />
 					<ScrollBar orientation="horizontal" />

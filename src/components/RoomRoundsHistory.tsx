@@ -1,10 +1,9 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
-type RoundsHistoryProps = {
+import { cn } from '@/lib/utils';
+interface RoundsHistoryProps extends React.HTMLAttributes<HTMLDivElement> {
 	gameRounds: GameRoundResult[];
-	className?: string;
 	selectedRoundIndex?: number | null;
 	onRoundSelect?: (index: number) => void;
 };
@@ -12,12 +11,14 @@ type RoundsHistoryProps = {
 export const RoomRoundsHistory: React.FC<RoundsHistoryProps> = ({
 	gameRounds = [],
 	selectedRoundIndex = null,
-	onRoundSelect = () => { }
+	onRoundSelect = () => { },
+	className = '',
+	...props
 }) => {
 	const displayRounds = [...gameRounds].reverse();
 
 	return (
-		<Card className="border-slate-200 shadow-sm">
+		<Card className={cn("border-slate-200 shadow-sm", className)} {...props}>
 			<CardHeader className="pb-2">
 				<CardTitle className="text-base md:text-lg font-medium text-slate-800">Round History</CardTitle>
 			</CardHeader>

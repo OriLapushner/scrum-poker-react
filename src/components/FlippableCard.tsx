@@ -5,8 +5,6 @@ interface FlippableCardCardProps {
 	backContent: ReactNode;
 	isFlipped: boolean;
 	className?: string;
-	width?: string;
-	height?: string;
 }
 
 export const FlippableCard: React.FC<FlippableCardCardProps> = ({
@@ -14,13 +12,11 @@ export const FlippableCard: React.FC<FlippableCardCardProps> = ({
 	backContent,
 	isFlipped,
 	className = '',
-	width = 'w-16',
-	height = 'h-24'
 }) => {
 	return (
-		<div className="w-full h-full flex items-center justify-center p-8">
+		<div className="w-full h-full flex items-center justify-center">
 			<div
-				className={`relative ${width} ${height} transform-gpu transition-transform duration-700 preserve-3d ${isFlipped ? 'rotate-y-180' : ''
+				className={`relative transform-gpu transition-transform duration-700 preserve-3d ${isFlipped ? 'rotate-y-180' : ''
 					} ${className}`}
 			>
 				{/* Front of card */}
