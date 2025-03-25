@@ -11,6 +11,8 @@ import { useState } from 'react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { MobileRoomLayout } from '@/components/MobileRoomLayout';
 import { DesktopRoomLayout } from '@/components/DesktopRoomLayout';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+
 
 const ScrumPokerLayout = () => {
 	const router = useRouter();
@@ -114,12 +116,9 @@ const ScrumPokerLayout = () => {
 	}
 
 	return (
-		<div className="min-h-screen w-full bg-slate-50 p-4 md:p-8 flex flex-col pb-28 lg:pb-8">
+		<div className="min-h-screen w-full bg-slate-50 p-4 md:p-8 flex flex-col lg:pb-8">
 			<div className="flex flex-col sm:flex-row justify-between items-center mb-4 md:mb-8 pb-4 border-b border-slate-200">
-				<div className="flex flex-col mb-3 sm:mb-0 items-center sm:items-start">
-					<span className="text-sm font-medium text-slate-500">Room Name</span>
-					<span className="text-xl md:text-2xl font-bold text-slate-800">{roomName}</span>
-				</div>
+				<span className="text-xl md:text-2xl font-bold text-slate-800">{roomName}</span>
 				<JoinRoomLink roomLink={roomLink} />
 			</div>
 
@@ -155,8 +154,11 @@ const ScrumPokerLayout = () => {
 				/>
 			)}
 
-			<div className="fixed lg:static bottom-0 left-0 right-0 bg-slate-50 shadow-lg lg:shadow-none pt-2 lg:pt-0 z-10">
-				<RoomDeck deck={deck} selectedCard={localGuestVoteValue} onCardClicked={handleCardClicked} />
+			<div className="z-10">
+				<ScrollArea className="w-full overflow-x-auto">
+					<RoomDeck deck={deck} selectedCard={localGuestVoteValue} onCardClicked={handleCardClicked} />
+					<ScrollBar orientation="horizontal" />
+				</ScrollArea>
 			</div>
 			<Toaster />
 		</div>
