@@ -174,7 +174,7 @@ export function Header() {
 
 	return (
 		<header className="sticky top-0 z-40 bg-white shadow">
-			<div className="flex min-h-16 max-w-7xl px-4 sm:px-6 lg:px-8 justify-between">
+			<div className="flex min-h-16 px-4 sm:px-6 lg:px-8 justify-between">
 				<div className="flex shrink-0 items-center gap-2 px-2">
 					<CardsIcon width={40} height={40} className="rounded" />
 					<div className="flex flex-col -space-y-1">
