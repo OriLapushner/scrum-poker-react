@@ -2,21 +2,15 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useRoomStore } from '@/store/Room';
-import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast"
-import { PulsatingButton } from "@/components/magicui/pulsating-button";
 import { JoinRoomLink } from "@/components/JoinRoomLink";
 import { RoomDeck } from '@/components/RoomDeck';
-import { RoomVoteStatus } from '@/components/RoomVoteStatus';
 import { JoinRoomMenu } from '@/components/JoinRoomMenu';
-import { RoomGuestList } from '@/components/RoomGuestList';
-import { RoomRoundsHistory } from '@/components/RoomRoundsHistory';
 import { useState } from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { MobileRoomLayout } from '@/components/MobileRoomLayout';
+import { DesktopRoomLayout } from '@/components/DesktopRoomLayout';
 
 const ScrumPokerLayout = () => {
 	const router = useRouter();
@@ -145,76 +139,20 @@ const ScrumPokerLayout = () => {
 					handleRoundSelect={handleRoundSelect}
 				/>
 			) : (
-				// Desktop layout
-				<div className="flex-1 flex gap-6 min-w-0 overflow-hidden">
-					<div className="flex-shrink basis-72 min-w-[180px]">
-						<RoomGuestList
-							guests={allGuests}
-						/>
-					</div>
-
-					<div className="flex-grow flex flex-col items-center justify-center space-y-8 basis-96 min-w-[300px]">
-						{isViewingHistory && (
-							<div className="w-full max-w-md mb-4">
-								<Alert className="bg-amber-50 border border-amber-200 shadow-sm">
-									<div className="flex items-center justify-between w-full">
-										<div className="flex items-center gap-2">
-											<AlertCircle className="h-4 w-4 text-amber-600" />
-											<div>
-												<AlertTitle className="text-amber-900 font-medium text-sm mb-0">
-													Round {selectedRoundIndex + 1} History
-												</AlertTitle>
-												<AlertDescription className="text-amber-800 text-xs">
-													Viewing Round history
-												</AlertDescription>
-											</div>
-										</div>
-										<Button
-											variant="outline"
-											size="sm"
-											onClick={() => setSelectedRoundIndex(null)}
-											className="h-8 border-amber-300 bg-amber-100/50 text-amber-800 hover:bg-amber-100 hover:text-amber-900"
-										>
-											Back to Current
-										</Button>
-									</div>
-								</Alert>
-							</div>
-						)}
-
-						<RoomVoteStatus
-							votes={displayedVotes}
-							isRevealed={isViewingHistory ? true : isRevealed}
-							currentRoundResult={displayedResults}
-						/>
-
-						{!isViewingHistory && !isRevealed && (
-							<PulsatingButton
-								onClick={handleRevealCardClicked}
-								className="bg-primary-800 hover:bg-primary-900"
-								disabled={!isReadyToReveal}
-								isPulsating={isReadyToReveal}
-								pulseColor="#06b6d4"
-							>
-								Reveal Votes
-							</PulsatingButton>
-						)}
-
-						{!isViewingHistory && isRevealed && (
-							<Button onClick={handleStartNewRound}>
-								New round
-							</Button>
-						)}
-					</div>
-
-					<div className="flex-shrink basis-72 min-w-[180px] ml-auto">
-						<RoomRoundsHistory
-							gameRounds={previousRoundsResults}
-							selectedRoundIndex={selectedRoundIndex}
-							onRoundSelect={handleRoundSelect}
-						/>
-					</div>
-				</div>
+				<DesktopRoomLayout
+					isViewingHistory={isViewingHistory}
+					selectedRoundIndex={selectedRoundIndex}
+					displayedVotes={displayedVotes}
+					isRevealed={isRevealed}
+					displayedResults={displayedResults}
+					isReadyToReveal={isReadyToReveal}
+					allGuests={allGuests}
+					previousRoundsResults={previousRoundsResults}
+					handleRevealCardClicked={handleRevealCardClicked}
+					handleStartNewRound={handleStartNewRound}
+					setSelectedRoundIndex={setSelectedRoundIndex}
+					handleRoundSelect={handleRoundSelect}
+				/>
 			)}
 
 			<div className="fixed lg:static bottom-0 left-0 right-0 bg-slate-50 shadow-lg lg:shadow-none pt-2 lg:pt-0 z-10">
