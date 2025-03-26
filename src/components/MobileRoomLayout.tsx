@@ -57,7 +57,7 @@ export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 					<TabsTrigger value="participants" className="flex-1">Participants</TabsTrigger>
 				</TabsList>
 
-				<TabsContent value="game" className="flex-1 flex flex-col min-h-0 mt-0">
+				<TabsContent value="game">
 					<div className="flex-grow flex flex-col items-center space-y-4 pb-4">
 						{isViewingHistory && (
 							<div className="w-full max-w-md mb-4">
@@ -113,16 +113,18 @@ export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 					</div>
 				</TabsContent>
 
-				<TabsContent value="history" className="flex-1 min-h-0 mt-0">
+				<TabsContent value="history" className="flex justify-center">
 					<RoomRoundsHistory
+						className='w-full max-w-md'
 						gameRounds={previousRoundsResults}
 						selectedRoundIndex={selectedRoundIndex}
 						onRoundSelect={handleRoundSelected}
 					/>
 				</TabsContent>
 
-				<TabsContent value="participants" className="flex-1 min-h-0 mt-0">
+				<TabsContent value="participants" className="flex justify-center">
 					<RoomGuestList
+						className='w-full max-w-md'
 						guests={allGuests}
 					/>
 				</TabsContent>
