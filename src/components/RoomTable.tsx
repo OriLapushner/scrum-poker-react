@@ -80,10 +80,10 @@ export function RoomTable({ votes = [], isRevealed = false, className, currentRo
 								frontContent={frontCard}
 								backContent={backCard}
 								isFlipped={flippedCards[player.guest.id] || false}
-								className="h-12 lg:h-14 aspect-[3/5]"
+								className="h-12 lg:h-14 xl:h-16 aspect-[3/5]"
 							/>
 
-							<span className="text-xs md:text-sm font-medium bg-white px-2 py-0.5 rounded-full shadow-sm">
+							<span className="text-white text-xs md:text-sm font-medium bg-gray-600/80 px-2 py-0.5 rounded-full shadow-sm">
 								{player.guest.name}
 							</span>
 						</div>

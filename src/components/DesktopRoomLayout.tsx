@@ -39,7 +39,7 @@ export const DesktopRoomLayout = ({
 		<div className="flex flex-col justify-center items-center">
 			<div className="flex gap-4 justify-center w-full">
 				<RoomGuestList
-					className='min-w-56 w-1/5'
+					className='min-w-56 w-1/5 max-w-64'
 					guests={allGuests}
 				/>
 
@@ -86,7 +86,7 @@ export const DesktopRoomLayout = ({
 				</div>
 
 				<RoomRoundsHistory
-					className='min-w-56 w-1/5'
+					className='min-w-56 w-1/5 max-w-64'
 					gameRounds={previousRoundsResults}
 					selectedRoundIndex={selectedRoundIndex}
 					onRoundSelect={handleRoundSelect}
