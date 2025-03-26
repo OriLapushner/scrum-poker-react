@@ -256,10 +256,7 @@ export const useRoomStore = create<RoomStore>()(
         vote: (payload: VoteValue) => {
             const state = get();
             const localGuestId = state.localGuest.id;
-            const newCurrentRound = [
-                ...state.currentRound.filter(vote => vote.guestId !== localGuestId),
-                { voteValue: payload, guestId: localGuestId }
-            ]
+
             set((state) => ({
                 currentRound: [
                     ...state.currentRound.filter(vote => vote.guestId !== localGuestId),
