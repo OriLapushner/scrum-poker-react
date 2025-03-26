@@ -130,7 +130,8 @@ export const useRoomStore = create<RoomStore>()(
                 guest.isConnected = false;
                 guest.isInRound = false;
                 const filteredGuests = get().remoteGuests.filter(guest => guest.id !== guestId);
-                set({ remoteGuests: [...filteredGuests, guest] })
+                const updatedCurrentRound = get().currentRound.filter(vote => vote.guestId !== guestId);
+                set({ remoteGuests: [...filteredGuests, guest], currentRound: updatedCurrentRound })
             }
         },
 
@@ -349,13 +350,7 @@ export const useRoomStore = create<RoomStore>()(
             const allGuests = state.getAllGuests();
 
             return round.map(vote => {
-                const guest = allGuests.find(g => g.id === vote.guestId) || {
-                    id: vote.guestId,
-                    name: 'Unknown Guest',
-                    isConnected: false,
-                    isInRound: false
-                };
-
+                const guest = allGuests.find(g => g.id === vote.guestId)!
                 const card = state.deck.cards[vote.voteValue ?? 0];
                 return {
                     guest,
