@@ -125,7 +125,6 @@ export const useRoomStore = create<RoomStore>()(
             get().setNewRoundState();
         },
         handleGuestDisconnected: (guestId: string) => {
-            console.log('guest disconnected', guestId);
             const guest = get().remoteGuests.find(guest => guest.id === guestId)
             if (guest) {
                 guest.isConnected = false;
@@ -169,7 +168,6 @@ export const useRoomStore = create<RoomStore>()(
                         currentRound: [{ guestId: response.localGuestId, voteValue: null }]
                     });
 
-                    console.log('room created', response);
                     resolve(response.roomId);
                 });
 
@@ -196,7 +194,6 @@ export const useRoomStore = create<RoomStore>()(
                         reject(new Error(`Join room failed: ${response.error}`));
                         return;
                     }
-                    console.log('current round', response.currentRound);
 
                     set({
                         isRevealed: response.isReaveled,
@@ -263,7 +260,6 @@ export const useRoomStore = create<RoomStore>()(
                 ...state.currentRound.filter(vote => vote.guestId !== localGuestId),
                 { voteValue: payload, guestId: localGuestId }
             ]
-            console.log('new current round', newCurrentRound);
             set((state) => ({
                 currentRound: [
                     ...state.currentRound.filter(vote => vote.guestId !== localGuestId),

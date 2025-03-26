@@ -1,6 +1,5 @@
 
 const saveObject = (key: string, obj: object) => {
-	console.log('saveObject', key, obj);
 	window.localStorage.setItem(key, JSON.stringify(obj));
 }
 
