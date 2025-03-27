@@ -15,6 +15,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Scrum Poker",
   description: "Scrum Poker App",
+  icons: {
+    icon: [
+      {
+        url: "cards-icon.svg",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

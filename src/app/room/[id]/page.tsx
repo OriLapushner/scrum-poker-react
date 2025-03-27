@@ -32,6 +32,7 @@ const ScrumPokerLayout = () => {
 	const localGuestVoteValue = useRoomStore(state => state.getLocalGuestVoteValue());
 	const getVotesStateForRound = useRoomStore(state => state.getVotesStateForPreviousRound);
 	const isVotingDisabled = useRoomStore(state => state.getIsVotingDisabled());
+
 	const vote = useRoomStore(state => state.vote);
 	const joinRoom = useRoomStore(state => state.join);
 	const revealCards = useRoomStore(state => state.revealCards);
