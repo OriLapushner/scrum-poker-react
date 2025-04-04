@@ -37,7 +37,7 @@ export const RoomRoundsHistory: React.FC<RoundsHistoryProps> = ({
 								return (
 									<div
 										key={originalIndex}
-										className={`flex items-center justify-between p-2 md:p-3 rounded-lg transition-all duration-200 cursor-pointer
+										className={`flex items-center justify-between p-2 md:p-3 rounded-lg transition-all duration-200 cursor-pointer group
 											${isSelected
 												? 'bg-secondary-50 border border-primary-200 shadow-sm'
 												: 'bg-slate-50 border border-slate-100 hover:bg-slate-100'}`}
@@ -47,8 +47,8 @@ export const RoomRoundsHistory: React.FC<RoundsHistoryProps> = ({
 											Round {originalIndex + 1}
 										</span>
 										<span className={`px-2 md:px-2.5 py-0.5 md:py-1 rounded text-xs md:text-sm font-medium
-											${isSelected ? 'bg-primary-100 text-primary-700' : 'bg-slate-100 text-slate-600'}`}>
-											{round.result}
+											${isSelected ? 'bg-primary-100 text-primary-700' : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'}`}>
+											{round.result}ss
 										</span>
 									</div>
 								);

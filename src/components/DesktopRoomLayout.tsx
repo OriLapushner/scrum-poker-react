@@ -43,7 +43,7 @@ export const DesktopRoomLayout = ({
 					guests={allGuests}
 				/>
 
-				<div className="flex-grow">
+				<div className="flex-grow flex flex-col justify-between items-center">
 					{isViewingHistory && (
 						<div className="w-full max-w-md mb-4">
 							<Alert className="bg-amber-50 border border-amber-200 shadow-sm">
@@ -77,9 +77,11 @@ export const DesktopRoomLayout = ({
 						isRevealed={isViewingHistory ? true : isRevealed}
 						currentRoundResult={displayedResults || { result: 0 }}
 					/>
-
 					{!isViewingHistory && isRevealed && (
-						<Button onClick={handleStartNewRound}>
+						<Button
+							onClick={handleStartNewRound}
+							className='bg-primary-600 hover:bg-primary-700 w-28 my-6'
+						>
 							New round
 						</Button>
 					)}
