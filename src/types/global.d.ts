@@ -36,12 +36,13 @@ declare global {
         localGuestId: string,
         currentRound: GameRound,
         previousRounds: GameRound[],
-        localGuestId: string
+        localGuestId: string,
+        secretId: string
     } | errorResponse
 
     type RejoinRoomResponse = JoinRoomResponse & {
         localGuestName: string
-    } | errorResponse
+    }
 
     type CreateRoomProps = {
         deck: Deck,

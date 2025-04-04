@@ -48,7 +48,7 @@ export const RoomRoundsHistory: React.FC<RoundsHistoryProps> = ({
 										</span>
 										<span className={`px-2 md:px-2.5 py-0.5 md:py-1 rounded text-xs md:text-sm font-medium
 											${isSelected ? 'bg-primary-100 text-primary-700' : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'}`}>
-											{round.result}ss
+											{round.result}
 										</span>
 									</div>
 								);

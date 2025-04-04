@@ -5,7 +5,6 @@ import { create } from 'zustand';
 import io, { Socket } from 'socket.io-client';
 
 const SERVER_ADDRESS = process.env.NEXT_PUBLIC_SERVER_ADDRESS
-const LOCAL_STORAGE_TIME_LIMIT = 1000 * 60 * 60 * 1
 interface RoomState {
     roomName: string;
     socket: Socket | null;
@@ -16,7 +15,6 @@ interface RoomState {
     previousRounds: GameRound[];
     roomId: string | null;
     isRevealed: boolean;
-    secretId: string;
 }
 
 interface RoomStore extends RoomState {
@@ -25,20 +23,6 @@ interface RoomStore extends RoomState {
     setCurrentRoundVote: (vote: Vote) => void;
     setNewRoundState: () => void;
 
-    // Getters
-    getRoomsFromLocalStorage: () => { secretId: string, roomId: string, timeStamp: number }[] | null;
-    getSecretIdFromLocalStorage: (roomId: string) => string | null;
-    getAllGuests: () => Guest[];
-    getVotingGuests: () => Guest[];
-    getVotesState: () => VotesState;
-    getVotesStateFromRound: (round: GameRound) => VotesState;
-    getVotesStateForPreviousRound: (roundIndex: number | null) => VotesState;
-    getLocalGuestVoteValue: () => VoteValue;
-    getIsReadyToReveal: () => boolean;
-    getResultFromRound: (round: GameRound, cards: Card[]) => GameRoundResult;
-    getCurrentRoundResults: () => GameRoundResult;
-    getPreviousRoundsResults: () => GameRoundResult[];
-    getIsVotingDisabled: () => boolean;
     // Event handlers
     handleGuestJoined: (guest: Guest) => void;
     handleGuestLeft: (guestId: string) => void;
@@ -49,7 +33,6 @@ interface RoomStore extends RoomState {
     subscribeToEvents: (socket: Socket) => void;
 
     // Complex actions
-    saveIdToLocalStorage: (secretId: string) => void;
     create: (payload: CreateRoomProps) => Promise<string>;
     join: (payload: JoinRoomProps) => Promise<void>
     rejoinRoom: (payload: RejoinRoomProps) => Promise<void>;
@@ -60,7 +43,6 @@ interface RoomStore extends RoomState {
 }
 
 const INITIAL_STATE: RoomState = {
-    secretId: '',
     roomName: 'room name',
     socket: null,
     remoteGuests: [],
@@ -90,7 +72,8 @@ export const useRoomStore = create<RoomStore>()(
             const state = get();
             const updatedRemoteGuests = state.remoteGuests.map(guest => ({ ...guest, isInRound: true }))
             const updatedLocalGuest = { ...state.localGuest, isInRound: true }
-            const currentRound = [...updatedRemoteGuests, updatedLocalGuest].map(guest => ({ guestId: guest.id, voteValue: null }))
+            const filteredRemoteGuests = updatedRemoteGuests.filter(guest => guest.isConnected)
+            const currentRound = [...filteredRemoteGuests, updatedLocalGuest].map(guest => ({ guestId: guest.id, voteValue: null }))
             set({
                 currentRound,
                 isRevealed: false,
@@ -121,9 +104,11 @@ export const useRoomStore = create<RoomStore>()(
         handleCardsRevealed: () => {
             set({ isRevealed: true });
         },
+
         handleNewRoundStarted: () => {
             get().setNewRoundState();
         },
+
         handleGuestDisconnected: (guestId: string) => {
             const guest = get().remoteGuests.find(guest => guest.id === guestId)
             if (guest) {
@@ -148,12 +133,8 @@ export const useRoomStore = create<RoomStore>()(
         create: (payload: CreateRoomProps) => {
             return new Promise((resolve, reject) => {
                 const socket = io(SERVER_ADDRESS, { timeout: 5000 });
-                const state = get();
-                set(INITIAL_STATE);
-
-                set({
-                    socket
-                });
+                const state = get()
+                set({ ...INITIAL_STATE, socket });
 
                 socket.emit('create_room', payload, (response: CreateRoomResponse) => {
                     if ("error" in response) {
@@ -164,7 +145,7 @@ export const useRoomStore = create<RoomStore>()(
                         roomId: response.roomId,
                         deck: payload.deck,
                         roomName: payload.roomName,
-                        secretId: response.secretId,
+                        // secretId: response.secretId,
                         localGuest: { ...state.localGuest, id: response.localGuestId, isInRound: true, name: payload.guestName },
                         currentRound: [{ guestId: response.localGuestId, voteValue: null }]
                     });
@@ -195,7 +176,7 @@ export const useRoomStore = create<RoomStore>()(
                         reject(new Error(`Join room failed: ${response.error}`));
                         return;
                     }
-
+                    console.log('response', response);
                     set({
                         isRevealed: response.isReaveled,
                         roomName: response.roomName,
@@ -226,11 +207,13 @@ export const useRoomStore = create<RoomStore>()(
                 socket.on('connect_error', (error) => {
                     reject(new Error(`Connection failed: ${error.message}`));
                 });
+
                 socket.emit('rejoin_room', payload, (response: RejoinRoomResponse) => {
                     if ("error" in response) {
                         reject(new Error(`Rejoin room failed: ${response.error}`));
                         return;
                     }
+
                     set({
                         isRevealed: response.isReaveled,
                         roomName: response.roomName,
@@ -240,7 +223,8 @@ export const useRoomStore = create<RoomStore>()(
                         roomId: payload.roomId,
                         localGuest: { ...state.localGuest, name: response.localGuestName, isInRound: !response.isReaveled }
                     });
-                    get().subscribeToEvents(socket);
+
+                    state.subscribeToEvents(socket);
                     resolve();
                 });
             })
@@ -293,113 +277,6 @@ export const useRoomStore = create<RoomStore>()(
                     resolve();
                 });
             });
-        },
-
-        saveIdToLocalStorage: (secretId) => {
-            const state = get();
-            const stringifiedData = JSON.stringify({
-                secretId,
-                roomId: state.roomId,
-                timeStamp: Date.now()
-            });
-            localStorage.setItem('rooms', stringifiedData);
-        },
-
-        getRoomsFromLocalStorage: () => {
-            const rooms = localStorage.getItem('rooms');
-            if (!rooms) {
-                return [];
-            }
-            return JSON.parse(rooms) as LocalStorageRoom[];
-        },
-
-        getSecretIdFromLocalStorage: (roomId) => {
-            const state = get();
-            const rooms = state.getRoomsFromLocalStorage();
-            const timeLimit = Date.now() - LOCAL_STORAGE_TIME_LIMIT;
-            const filteredRooms = rooms?.filter(room => room.timeStamp > timeLimit);
-            localStorage.setItem('rooms', JSON.stringify(filteredRooms));
-            const roomData = filteredRooms?.find(room => room.roomId === roomId);
-            return roomData?.secretId ?? null;
-        },
-
-        getAllGuests: () => {
-            const state = get();
-            return [state.localGuest, ...state.remoteGuests];
-        },
-
-        getLocalGuestVoteValue: () => {
-            const state = get();
-            const localGuestId = state.localGuest.id;
-            const localGuestVote = state.currentRound.find(vote => vote.guestId === localGuestId);
-            return localGuestVote?.voteValue ?? null;
-        },
-
-        getVotingGuests: () => {
-            const allGuests = get().getAllGuests();
-            return allGuests.filter(guest => guest.isInRound && guest.isConnected);
-        },
-
-        getVotesState: () => {
-            const state = get();
-            return state.getVotesStateFromRound(state.currentRound);
-        },
-
-        getVotesStateFromRound: (round: GameRound) => {
-            const state = get();
-            const allGuests = state.getAllGuests();
-
-            return round.map(vote => {
-                const guest = allGuests.find(g => g.id === vote.guestId)!
-                const card = state.deck.cards[vote.voteValue ?? 0];
-                return {
-                    guest,
-                    cardValue: vote?.voteValue === null ? null : card.value,
-                    displayName: card.displayName
-                };
-            });
-        },
-
-        getIsVotingDisabled: () => {
-            const state = get();
-            return !state.localGuest.isInRound;
-        },
-
-        getVotesStateForPreviousRound: (roundIndex: number | null) => {
-            if (roundIndex === null) return [];
-            const state = get();
-            const round = state.previousRounds[roundIndex];
-            if (!round) return [];
-
-            return state.getVotesStateFromRound(round);
-        },
-
-        getResultFromRound: (round: GameRound, cards: Card[]) => {
-            const totalVotesValue = round.reduce((acc, vote) => {
-                let result = 0;
-                if (vote.voteValue !== null) {
-                    result = cards[vote.voteValue].value;
-                }
-                return acc + result
-            }, 0);
-            return { result: totalVotesValue / round.length };
-        },
-
-        getCurrentRoundResults: () => {
-            const state = get();
-            return state.getResultFromRound(state.currentRound, state.deck.cards);
-        },
-
-        getIsReadyToReveal: () => {
-            const state = get();
-            return state.getVotingGuests().length === state.currentRound.filter(vote => vote.voteValue !== null).length;
-        },
-
-        getPreviousRoundsResults: () => {
-            const state = get();
-            return state.previousRounds.map(round => {
-                return state.getResultFromRound(round, state.deck.cards);
-            })
         },
     }),
 );

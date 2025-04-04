@@ -1,5 +1,5 @@
 'use client';
-import { shallow } from 'zustand/shallow';
+import { useShallow } from 'zustand/react/shallow';
 import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Dialog, DialogTrigger, DialogContent, DialogTitle } from '@/components/ui/dialog';
@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Users, Diamond, NotebookText } from 'lucide-react';
 import { useDecksManagerStore } from '@/store/DecksManager';
-import { useRoomStore } from '@/store/Room';
+import { useRoomStore } from '@/store/Room/Room';
 import { useRouter } from 'next/navigation'
 import { CreateDeckMenu } from '@/components/CreateDeckMenu';
 
@@ -25,7 +25,7 @@ interface FormErrors {
 
 export default function CreateGameMenu() {
 	const createRoom = useRoomStore(state => state.create);
-	const allDecks = useDecksManagerStore(state => state.getAllDecks(), shallow);
+	const allDecks = useDecksManagerStore(useShallow(state => state.getAllDecks()));
 	const router = useRouter();
 	const [isEditorOpen, setIsEditorOpen] = useState(false);
 	const [decks, setDecks] = useState<Deck[]>([]);

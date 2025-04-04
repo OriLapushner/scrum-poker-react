@@ -1,20 +1,28 @@
 'use client';
-
 import { useParams, useRouter } from 'next/navigation';
-import { useRoomStore } from '@/store/Room';
+import { useRoomStore } from '@/store/Room/Room';
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast"
 import { JoinRoomLink } from "@/components/JoinRoomLink";
 import { RoomDeck } from '@/components/RoomDeck';
 import { JoinRoomMenu } from '@/components/JoinRoomMenu';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { MobileRoomLayout } from '@/components/MobileRoomLayout';
 import { DesktopRoomLayout } from '@/components/DesktopRoomLayout';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-
+import {
+	getVotesStateFromRound, getRoundsResults,
+	getResultFromRound, getIsReadyToReveal, getGuestVoteValue
+} from '@/store/Room/RoomGetters';
 
 const ScrumPokerLayout = () => {
+	const params = useParams();
+	const roomId = typeof params.id === 'string' ? params.id : '';
+	const domain = window?.location?.host || '';
+	const protocol = window?.location?.protocol || 'https'
+	const roomLink = `${protocol}://${domain}/room/${roomId}`;
+
 	const router = useRouter();
 	const { toast } = useToast();
 	const [historySelectedRoundIndex, setHistorySelectedRoundIndex] = useState<number | null>(null);
@@ -23,31 +31,30 @@ const ScrumPokerLayout = () => {
 	const roomName = useRoomStore(state => state.roomName);
 	const roomIdFromStore = useRoomStore(state => state.roomId);
 	const isRevealed = useRoomStore(state => state.isRevealed);
+	const currentRound = useRoomStore(state => state.currentRound);
+	const previousRounds = useRoomStore(state => state.previousRounds);
+	const localGuest = useRoomStore(state => state.localGuest);
+	const remoteGuests = useRoomStore(state => state.remoteGuests);
 
-	const currentRoundResults = useRoomStore(state => state.getCurrentRoundResults());
-	const previousRoundsResults = useRoomStore(state => state.getPreviousRoundsResults());
-	const isReadyToReveal = useRoomStore(state => state.getIsReadyToReveal());
-	const allGuests = useRoomStore(state => state.getAllGuests());
-	const votesState = useRoomStore(state => state.getVotesState());
-	const localGuestVoteValue = useRoomStore(state => state.getLocalGuestVoteValue());
-	const getVotesStateForRound = useRoomStore(state => state.getVotesStateForPreviousRound);
-	const isVotingDisabled = useRoomStore(state => state.getIsVotingDisabled());
+	const localGuestVoteValue = getGuestVoteValue(localGuest, currentRound);
+	const currentRoundResults = useMemo(() => getResultFromRound(currentRound, deck), [currentRound, deck]);
+	const isReadyToReveal = useMemo(() => getIsReadyToReveal(currentRound), [currentRound]);
+	const allGuests = useMemo(() => [localGuest, ...remoteGuests], [localGuest, remoteGuests]);
+	const previousRoundsResults = useMemo(() => getRoundsResults(previousRounds, deck), [previousRounds, deck])
+	const currentRoundVotesState = useMemo(() => {
+		return getVotesStateFromRound(currentRound, allGuests, deck)
+	}, [currentRound, allGuests, deck]);
+
+	// Determine which votes to display based on selection
+	const displayedVotes = useMemo(() => {
+		if (historySelectedRoundIndex === null) return currentRoundVotesState;
+		return getVotesStateFromRound(previousRounds[historySelectedRoundIndex], allGuests, deck);
+	}, [historySelectedRoundIndex, currentRoundVotesState, previousRounds, allGuests, deck]);
 
 	const vote = useRoomStore(state => state.vote);
 	const joinRoom = useRoomStore(state => state.join);
 	const revealCards = useRoomStore(state => state.revealCards);
 	const startNewRound = useRoomStore(state => state.startNewRound);
-
-	const params = useParams();
-	const roomId = typeof params.id === 'string' ? params.id : '';
-	const domain = window?.location?.host || '';
-	const protocol = window?.location?.protocol || 'https'
-	const roomLink = `${protocol}://${domain}/room/${roomId}`;
-
-	// Determine which votes to display based on selection
-	const displayedVotes = historySelectedRoundIndex !== null
-		? getVotesStateForRound(historySelectedRoundIndex)
-		: votesState;
 
 	const displayedResults = historySelectedRoundIndex !== null
 		? previousRoundsResults[historySelectedRoundIndex]
@@ -157,7 +164,7 @@ const ScrumPokerLayout = () => {
 
 			<div className="z-10 absolute bottom-0 left-0 right-0">
 				<ScrollArea className="w-full overflow-x-auto">
-					<RoomDeck isDisabled={isVotingDisabled} deck={deck} selectedCard={localGuestVoteValue} onCardClicked={handleCardClicked} />
+					<RoomDeck isDisabled={!localGuest.isInRound} deck={deck} selectedCard={localGuestVoteValue} onCardClicked={handleCardClicked} />
 					<ScrollBar orientation="horizontal" />
 				</ScrollArea>
 			</div>
