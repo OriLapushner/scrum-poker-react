@@ -1,6 +1,7 @@
 "use client"
 
 import { create } from 'zustand';
+import { useLocalStorageRoomsStore } from '@/store/localStorageRooms';
 
 import io, { Socket } from 'socket.io-client';
 
@@ -35,7 +36,7 @@ interface RoomStore extends RoomState {
     // Complex actions
     create: (payload: CreateRoomProps) => Promise<string>;
     join: (payload: JoinRoomProps) => Promise<void>
-    rejoinRoom: (payload: RejoinRoomProps) => Promise<void>;
+    rejoinRoom: (roomId: string) => Promise<void>;
     leaveRoom: () => void;
     vote: (value: number | null) => void;
     revealCards: () => void;
@@ -62,11 +63,12 @@ export const useRoomStore = create<RoomStore>()(
             remoteGuests: state.remoteGuests.filter(guest => guest.id !== guestId)
         })),
 
-        setCurrentRoundVote: (vote) => set((state) => {
-            const currentRound = state.currentRound.filter(v => v.guestId !== vote.guestId);
+        setCurrentRoundVote: (vote: Vote) => {
+            const state = get();
+            const currentRound = state.currentRound.filter(stateVote => stateVote.guestId !== vote.guestId);
             currentRound.push(vote);
-            return { currentRound };
-        }),
+            set({ currentRound });
+        },
 
         setNewRoundState: () => {
             const state = get();
@@ -135,17 +137,18 @@ export const useRoomStore = create<RoomStore>()(
                 const socket = io(SERVER_ADDRESS, { timeout: 5000 });
                 const state = get()
                 set({ ...INITIAL_STATE, socket });
-
                 socket.emit('create_room', payload, (response: CreateRoomResponse) => {
                     if ("error" in response) {
                         reject(new Error(`Create room failed: ${response.error}`));
                         return;
                     }
+                    const localStorageRoomsState = useLocalStorageRoomsStore.getState()
+                    localStorageRoomsState.addRoom(response.roomId, response.secretId);
+
                     set({
                         roomId: response.roomId,
                         deck: payload.deck,
                         roomName: payload.roomName,
-                        // secretId: response.secretId,
                         localGuest: { ...state.localGuest, id: response.localGuestId, isInRound: true, name: payload.guestName },
                         currentRound: [{ guestId: response.localGuestId, voteValue: null }]
                     });
@@ -176,7 +179,8 @@ export const useRoomStore = create<RoomStore>()(
                         reject(new Error(`Join room failed: ${response.error}`));
                         return;
                     }
-                    console.log('response', response);
+                    const localStorageRoomsState = useLocalStorageRoomsStore.getState()
+                    localStorageRoomsState.addRoom(payload.roomId, response.secretId);
                     set({
                         isRevealed: response.isReaveled,
                         roomName: response.roomName,
@@ -199,7 +203,7 @@ export const useRoomStore = create<RoomStore>()(
             });
         },
 
-        rejoinRoom: (payload: RejoinRoomProps) => {
+        rejoinRoom: (roomId: string) => {
             return new Promise((resolve, reject) => {
                 const state = get();
                 const socket = io(SERVER_ADDRESS);
@@ -207,23 +211,25 @@ export const useRoomStore = create<RoomStore>()(
                 socket.on('connect_error', (error) => {
                     reject(new Error(`Connection failed: ${error.message}`));
                 });
+                const rooms = useLocalStorageRoomsStore.getState().rooms
+                const roomToJoin = rooms[roomId]
 
-                socket.emit('rejoin_room', payload, (response: RejoinRoomResponse) => {
+                socket.emit('rejoin_room', { roomId, secretId: roomToJoin?.secretId }, (response: RejoinRoomResponse) => {
                     if ("error" in response) {
                         reject(new Error(`Rejoin room failed: ${response.error}`));
                         return;
                     }
 
                     set({
+                        roomId,
                         isRevealed: response.isReaveled,
                         roomName: response.roomName,
                         deck: response.deck,
                         remoteGuests: response.guests,
                         currentRound: response.currentRound,
-                        roomId: payload.roomId,
-                        localGuest: { ...state.localGuest, name: response.localGuestName, isInRound: !response.isReaveled }
+                        localGuest: response.localGuest,
+                        previousRounds: response.previousRounds
                     });
-
                     state.subscribeToEvents(socket);
                     resolve();
                 });
@@ -241,14 +247,7 @@ export const useRoomStore = create<RoomStore>()(
         vote: (payload: VoteValue) => {
             const state = get();
             const localGuestId = state.localGuest.id;
-
-            set((state) => ({
-                currentRound: [
-                    ...state.currentRound.filter(vote => vote.guestId !== localGuestId),
-                    { voteValue: payload, guestId: localGuestId }
-                ]
-            }));
-
+            state.setCurrentRoundVote({ voteValue: payload, guestId: localGuestId });
             state.socket?.emit('vote', payload);
         },
 

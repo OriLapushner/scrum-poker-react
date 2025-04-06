@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast"
 import { JoinRoomLink } from "@/components/JoinRoomLink";
 import { RoomDeck } from '@/components/RoomDeck';
 import { JoinRoomMenu } from '@/components/JoinRoomMenu';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { MobileRoomLayout } from '@/components/MobileRoomLayout';
 import { DesktopRoomLayout } from '@/components/DesktopRoomLayout';
@@ -15,6 +15,13 @@ import {
 	getVotesStateFromRound, getRoundsResults,
 	getResultFromRound, getIsReadyToReveal, getGuestVoteValue
 } from '@/store/Room/RoomGetters';
+import { useLocalStorageRoomsStore } from '@/store/localStorageRooms';
+
+const isRoomInLocalStorage = (roomId: string) => {
+	const localStorageRooms = useLocalStorageRoomsStore.getState().rooms
+	const roomToJoin = localStorageRooms[roomId]
+	return !!roomToJoin
+}
 
 const ScrumPokerLayout = () => {
 	const params = useParams();
@@ -35,6 +42,8 @@ const ScrumPokerLayout = () => {
 	const previousRounds = useRoomStore(state => state.previousRounds);
 	const localGuest = useRoomStore(state => state.localGuest);
 	const remoteGuests = useRoomStore(state => state.remoteGuests);
+	const rejoinRoom = useRoomStore(state => state.rejoinRoom);
+	const leaveRoom = useRoomStore(state => state.leaveRoom);
 
 	const localGuestVoteValue = getGuestVoteValue(localGuest, currentRound);
 	const currentRoundResults = useMemo(() => getResultFromRound(currentRound, deck), [currentRound, deck]);
@@ -62,6 +71,17 @@ const ScrumPokerLayout = () => {
 
 	const isViewingHistory = historySelectedRoundIndex !== null;
 	const isMobile = useMediaQuery('(max-width: 1023px)');
+
+
+	useEffect(() => {
+		const currentRoomId = useRoomStore.getState().roomId
+		if (currentRoomId !== roomId && isRoomInLocalStorage(roomId)) {
+			rejoinRoom(roomId);
+		}
+		return () => {
+			leaveRoom();
+		}
+	}, [roomId, rejoinRoom, leaveRoom]);
 
 	const handleRevealCardClicked = async () => {
 		try {
@@ -112,7 +132,7 @@ const ScrumPokerLayout = () => {
 		startNewRound();
 	};
 
-	if (!roomIdFromStore) {
+	if (!roomIdFromStore && !isRoomInLocalStorage(roomId)) {
 		return (
 			<div className="h-screen w-full bg-slate-50 p-8 flex flex-col">
 				<div className="flex-1 flex items-center justify-center">

@@ -18,7 +18,7 @@ declare global {
         isInRound: boolean
     }
 
-    type errorResponse = {
+    type ErrorResponse = {
         error: string
     }
 
@@ -26,7 +26,7 @@ declare global {
         roomId: string,
         secretId: string,
         localGuestId: string
-    } | errorResponse
+    } | ErrorResponse
 
     type JoinRoomResponse = {
         isReaveled: boolean,
@@ -38,11 +38,11 @@ declare global {
         previousRounds: GameRound[],
         localGuestId: string,
         secretId: string
-    } | errorResponse
+    } | ErrorResponse
 
-    type RejoinRoomResponse = JoinRoomResponse & {
-        localGuestName: string
-    }
+    type RejoinRoomResponse = (Omit<Exclude<JoinRoomResponse, ErrorResponse>, 'secretId'> & {
+        localGuest: Guest
+    }) | ErrorResponse
 
     type CreateRoomProps = {
         deck: Deck,
@@ -52,11 +52,6 @@ declare global {
 
     type JoinRoomProps = {
         guestName: string,
-        roomId: string
-    }
-
-    type RejoinRoomProps = {
-        secretId: string
         roomId: string
     }
 
@@ -81,10 +76,6 @@ declare global {
 
     type VotesState = VoteEntry[];
 
-    type LocalStorageRoom = {
-        secretId: string,
-        roomId: string,
-        timeStamp: number
-    }
+    type LocalStorageRooms = { [key: string]: { secretId: string; timeStamp: number } }
 
 }
