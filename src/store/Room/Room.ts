@@ -16,6 +16,8 @@ interface RoomState {
     previousRounds: GameRound[];
     roomId: string | null;
     isRevealed: boolean;
+    isVoteResultsOpen: boolean;
+    historySelectedRoundIndex: number | null;
 }
 
 interface RoomStore extends RoomState {
@@ -23,6 +25,8 @@ interface RoomStore extends RoomState {
     removeRemoteGuest: (guestId: string) => void;
     setCurrentRoundVote: (vote: Vote) => void;
     setNewRoundState: () => void;
+    setIsVoteResultsOpen: (isOpen: boolean) => void;
+    setHistorySelectedRoundIndex: (index: number | null) => void;
 
     // Event handlers
     handleGuestJoined: (guest: Guest) => void;
@@ -52,7 +56,9 @@ const INITIAL_STATE: RoomState = {
     currentRound: [],
     previousRounds: [],
     roomId: null,
-    isRevealed: false
+    isRevealed: false,
+    isVoteResultsOpen: false,
+    historySelectedRoundIndex: null
 };
 
 export const useRoomStore = create<RoomStore>()(
@@ -84,6 +90,10 @@ export const useRoomStore = create<RoomStore>()(
                 remoteGuests: updatedRemoteGuests
             });
         },
+
+        setIsVoteResultsOpen: (isOpen: boolean) => set({ isVoteResultsOpen: isOpen }),
+
+        setHistorySelectedRoundIndex: (index: number | null) => set({ historySelectedRoundIndex: index }),
 
         // Event handlers
         handleGuestJoined: (guest: Guest) => {

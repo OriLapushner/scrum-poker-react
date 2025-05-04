@@ -3,20 +3,26 @@
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { FlippableCard } from "@/components/FlippableCard"
+import { Button } from "@/components/ui/button"
+import { useRoomStore } from "@/store/Room/Room"
 
 interface RoomTableProps {
 	votes: VoteEntry[];
-	isRevealed: boolean;
 	currentRoundResult: GameRoundResult;
 	className?: string;
 }
 
-export function RoomTable({ votes = [], isRevealed = false, className, currentRoundResult }: RoomTableProps) {
+export function RoomTable({ votes = [], className, currentRoundResult }: RoomTableProps) {
 	const [flippedCards, setFlippedCards] = useState<{ [key: string]: boolean }>({});
-
+	const isVoteResultsOpen = useRoomStore(state => state.isVoteResultsOpen);
+	const setIsVoteResultsOpen = useRoomStore(state => state.setIsVoteResultsOpen);
+	const isRevealed = useRoomStore(state => state.isRevealed);
+	const historySelectedRoundIndex = useRoomStore(state => state.historySelectedRoundIndex);
+	const toggleVoteResults = () => {
+		setIsVoteResultsOpen(!useRoomStore.getState().isVoteResultsOpen);
+	}
 	useEffect(() => {
 		setFlippedCards({});
-
 		if (isRevealed) {
 			votes.forEach((vote, index) => {
 				setTimeout(() => {
@@ -30,21 +36,31 @@ export function RoomTable({ votes = [], isRevealed = false, className, currentRo
 	}, [isRevealed, votes]);
 
 	const positionedPlayers = positionPlayers(votes);
-
+	const shouldShowResults = isRevealed || historySelectedRoundIndex !== null;
 	return (
 		<div className={cn("w-full max-w-3xl mx-auto", className)}>
 			<div className="relative w-[85%] mx-auto aspect-[4/3] md:aspect-[3/2] rounded-lg">
 				{/* Table */}
-				<div className="absolute inset-[30%] bg-blue-100 rounded-[50%] shadow-md flex items-center justify-center">
-					{isRevealed && (
-						<div className="px-4 py-1.5 bg-white rounded-full shadow-sm">
-							<div className="flex items-baseline gap-2">
-								<span className="text-xs text-slate-500">Average:</span>
-								<span className="text-sm font-bold text-primary">
-									{currentRoundResult.result}
-								</span>
+				<div className="absolute inset-[30%] bg-blue-100 rounded-[50%] shadow-md flex flex-col items-center justify-center gap-2">
+					{shouldShowResults && (
+						<>
+							<div className="px-4 py-1.5 bg-white rounded-full shadow-sm">
+								<div className="flex items-baseline gap-2">
+									<span className="text-xs text-slate-500">Average:</span>
+									<span className="text-sm font-bold text-primary">
+										{currentRoundResult.result}
+									</span>
+								</div>
 							</div>
-						</div>
+							<Button
+								onClick={toggleVoteResults}
+								variant="outline"
+								size="sm"
+								className="bg-white/80 hover:bg-white"
+							>
+								{isVoteResultsOpen ? "Hide Results" : "View Results"}
+							</Button>
+						</>
 					)}
 				</div>
 

@@ -1,22 +1,18 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from "@/components/ui/button";
-import { PulsatingButton } from "@/components/magicui/pulsating-button";
 import { RoomGuestList } from '@/components/RoomGuestList';
 import { RoomRoundsHistory } from '@/components/RoomRoundsHistory';
 import { RoomTable } from '@/components/RoomTable';
 import { AlertCircle } from 'lucide-react';
+import { RoomControls } from './RoomControls';
 
 interface DesktopRoomLayoutProps {
 	isViewingHistory: boolean;
 	selectedRoundIndex: number | null;
 	displayedVotes: VoteEntry[];
-	isRevealed: boolean;
 	displayedResults: GameRoundResult | null;
-	isReadyToReveal: boolean;
 	allGuests: Guest[];
 	previousRoundsResults: GameRoundResult[];
-	handleRevealCardClicked: () => void;
-	handleStartNewRound: () => void;
 	setSelectedRoundIndex: (index: number | null) => void;
 	handleRoundSelect: (index: number) => void;
 }
@@ -25,15 +21,11 @@ export const DesktopRoomLayout = ({
 	isViewingHistory,
 	selectedRoundIndex,
 	displayedVotes,
-	isRevealed,
 	displayedResults,
-	isReadyToReveal,
 	allGuests,
 	previousRoundsResults,
-	handleRevealCardClicked,
-	handleStartNewRound,
 	setSelectedRoundIndex,
-	handleRoundSelect
+	handleRoundSelect,
 }: DesktopRoomLayoutProps) => {
 	return (
 		<div className="flex flex-col justify-center items-center">
@@ -74,19 +66,10 @@ export const DesktopRoomLayout = ({
 
 					<RoomTable
 						votes={displayedVotes}
-						isRevealed={isViewingHistory ? true : isRevealed}
 						currentRoundResult={displayedResults || { result: 0 }}
 					/>
-					{!isViewingHistory && isRevealed && (
-						<Button
-							onClick={handleStartNewRound}
-							className='bg-primary-600 hover:bg-primary-700 w-28 my-6'
-						>
-							New round
-						</Button>
-					)}
+					<RoomControls />
 				</div>
-
 				<RoomRoundsHistory
 					className='min-w-56 w-1/5 max-w-64'
 					gameRounds={previousRoundsResults}
@@ -94,17 +77,6 @@ export const DesktopRoomLayout = ({
 					onRoundSelect={handleRoundSelect}
 				/>
 			</div>
-			{!isViewingHistory && !isRevealed && (
-				<PulsatingButton
-					onClick={handleRevealCardClicked}
-					className="bg-primary-800 hover:bg-primary-900 w-28 my-6"
-					disabled={!isReadyToReveal}
-					isPulsating={isReadyToReveal}
-					pulseColor="#06b6d4"
-				>
-					Reveal Votes
-				</PulsatingButton>
-			)}
 		</div>
 	);
 }; 

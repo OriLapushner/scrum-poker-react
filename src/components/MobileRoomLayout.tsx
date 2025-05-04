@@ -1,24 +1,19 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PulsatingButton } from "@/components/magicui/pulsating-button";
 import { AlertCircle } from 'lucide-react';
 import { RoomTable } from './RoomTable';
 import { RoomGuestList } from './RoomGuestList';
 import { RoomRoundsHistory } from './RoomRoundsHistory';
 import { useState } from 'react';
-
+import { RoomControls } from './RoomControls';
 interface MobileRoomLayoutProps {
 	isViewingHistory: boolean;
 	selectedRoundIndex: number | null;
 	displayedVotes: VoteEntry[];
-	isRevealed: boolean;
 	displayedResults: GameRoundResult | null;
-	isReadyToReveal: boolean;
 	allGuests: Guest[];
 	previousRoundsResults: GameRoundResult[];
-	handleRevealCardClicked: () => void;
-	handleStartNewRound: () => void;
 	setSelectedRoundIndex: (index: number | null) => void;
 	handleRoundSelect: (index: number) => void;
 }
@@ -27,15 +22,11 @@ export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 	isViewingHistory,
 	selectedRoundIndex,
 	displayedVotes,
-	isRevealed,
 	displayedResults,
-	isReadyToReveal,
 	allGuests,
 	previousRoundsResults,
-	handleRevealCardClicked,
-	handleStartNewRound,
 	setSelectedRoundIndex,
-	handleRoundSelect
+	handleRoundSelect,
 }) => {
 	const [activeTab, setActiveTab] = useState("game");
 
@@ -90,26 +81,10 @@ export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 						<RoomTable
 							className='w-full'
 							votes={displayedVotes}
-							isRevealed={isViewingHistory ? true : isRevealed}
 							currentRoundResult={displayedResults || { result: 0 }}
 						/>
 
-						{!isViewingHistory && !isRevealed && (
-							<PulsatingButton
-								onClick={handleRevealCardClicked}
-								className="bg-primary-800 hover:bg-primary-900 mt-4 w-28"
-								disabled={!isReadyToReveal}
-								isPulsating={isReadyToReveal}
-							>
-								Reveal Votes
-							</PulsatingButton>
-						)}
-
-						{!isViewingHistory && isRevealed && (
-							<Button onClick={handleStartNewRound} className="mt-4">
-								New round
-							</Button>
-						)}
+						<RoomControls />
 					</div>
 				</TabsContent>
 

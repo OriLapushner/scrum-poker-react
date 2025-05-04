@@ -34,4 +34,21 @@ const getGuestVoteValue = (guest: Guest, round: GameRound) => {
 	return vote?.voteValue ?? null;
 }
 
-export { getVotesStateFromRound, getResultFromRound, getRoundsResults, getIsReadyToReveal, getGuestVoteValue };
+const getGroupedVotes = (gameRound: GameRound, deck: Deck, guests: Guest[]) => {
+	const groupedVotes = gameRound.reduce<Record<number, { card: Card, guests: Guest[] }>>((acc, vote) => {
+		const voteValue = vote.voteValue ?? 0;
+		if (acc[voteValue]) {
+			acc[voteValue].guests.push(guests.find(guest => guest.id === vote.guestId)!);
+		} else {
+			acc[voteValue] = {
+				card: deck.cards[voteValue],
+				guests: [guests.find(guest => guest.id === vote.guestId)!]
+			};
+		}
+		return acc;
+	}, {});
+
+	return Object.values(groupedVotes);
+}
+
+export { getVotesStateFromRound, getResultFromRound, getRoundsResults, getIsReadyToReveal, getGuestVoteValue, getGroupedVotes };

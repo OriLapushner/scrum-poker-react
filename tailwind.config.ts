@@ -26,17 +26,17 @@ export default {
 					foreground: 'hsl(var(--primary-foreground))',
 
 					//  Cyan color shades
-					'50': '#ecfeff',
-					'100': '#cffafe',
-					'200': '#a5f3fc',
-					'300': '#67e8f9',
-					'400': '#22d3ee',
-					'500': '#06b6d4',
-					'600': '#0891b2',
-					'700': '#0e7490',
-					'800': '#155e75',
-					'900': '#164e63',
-					'950': '#083344'
+					'50': 'hsl(var(--primary-50))',
+					'100': 'hsl(var(--primary-100))',
+					'200': 'hsl(var(--primary-200))',
+					'300': 'hsl(var(--primary-300))',
+					'400': 'hsl(var(--primary-400))',
+					'500': 'hsl(var(--primary-500))',
+					'600': 'hsl(var(--primary-600))',
+					'700': 'hsl(var(--primary-700))',
+					'800': 'hsl(var(--primary-800))',
+					'900': 'hsl(var(--primary-900))',
+					'950': 'hsl(var(--primary-950))',
 
 				},
 				secondary: {
@@ -86,7 +86,8 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			animation: {
-				pulse: 'pulse var(--duration) ease-out infinite'
+				pulse: 'pulse var(--duration) ease-out infinite',
+				'center-expand': 'expandY 0.5s forwards, expandX 0.5s forwards 0.5s'
 			},
 			keyframes: {
 				pulse: {
@@ -96,6 +97,14 @@ export default {
 					'50%': {
 						boxShadow: '0 0 0 8px var(--pulse-color)'
 					}
+				},
+				expandY: {
+					'0%': { height: '0' },
+					'100%': { height: '100%' }
+				},
+				expandX: {
+					'0%': { width: '10px' },
+					'100%': { width: '100%' }
 				}
 			}
 		}
