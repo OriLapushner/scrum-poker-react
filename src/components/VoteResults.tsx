@@ -7,7 +7,7 @@ import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { useRoomStore } from '@/store/Room/Room';
 import { VoteResultsGuestNames } from '@/components/VoteResultsGuestNames';
 import { getGroupedVotes } from '@/store/Room/RoomGetters';
-const MotionCard = motion(Card);
+const MotionCard = motion.create(Card);
 
 export const VoteResults: React.FC<HTMLAttributes<HTMLDivElement>> = ({ className }) => {
 	const isVoteResultsOpen = useRoomStore(state => state.isVoteResultsOpen);

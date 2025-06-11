@@ -16,6 +16,7 @@ declare global {
         id: string,
         isConnected: boolean
         isInRound: boolean
+        isSpectator: boolean
     }
 
     type ErrorResponse = {

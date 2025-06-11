@@ -7,10 +7,10 @@ import { RoomGuestList } from './RoomGuestList';
 import { RoomRoundsHistory } from './RoomRoundsHistory';
 import { useState } from 'react';
 import { RoomControls } from './RoomControls';
+
 interface MobileRoomLayoutProps {
 	isViewingHistory: boolean;
 	selectedRoundIndex: number | null;
-	displayedVotes: VoteEntry[];
 	displayedResults: GameRoundResult | null;
 	allGuests: Guest[];
 	previousRoundsResults: GameRoundResult[];
@@ -21,7 +21,6 @@ interface MobileRoomLayoutProps {
 export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 	isViewingHistory,
 	selectedRoundIndex,
-	displayedVotes,
 	displayedResults,
 	allGuests,
 	previousRoundsResults,
@@ -80,7 +79,6 @@ export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 
 						<RoomTable
 							className='w-full'
-							votes={displayedVotes}
 							currentRoundResult={displayedResults || { result: 0 }}
 						/>
 

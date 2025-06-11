@@ -1,23 +1,35 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { cn } from "@/lib/utils"
 import { FlippableCard } from "@/components/FlippableCard"
 import { Button } from "@/components/ui/button"
 import { useRoomStore } from "@/store/Room/Room"
+import { getDisplayedVotes } from "@/store/Room/RoomGetters"
 
 interface RoomTableProps {
-	votes: VoteEntry[];
 	currentRoundResult: GameRoundResult;
 	className?: string;
 }
 
-export function RoomTable({ votes = [], className, currentRoundResult }: RoomTableProps) {
+export function RoomTable({ className, currentRoundResult }: RoomTableProps) {
 	const [flippedCards, setFlippedCards] = useState<{ [key: string]: boolean }>({});
 	const isVoteResultsOpen = useRoomStore(state => state.isVoteResultsOpen);
 	const setIsVoteResultsOpen = useRoomStore(state => state.setIsVoteResultsOpen);
 	const isRevealed = useRoomStore(state => state.isRevealed);
 	const historySelectedRoundIndex = useRoomStore(state => state.historySelectedRoundIndex);
+	const deck = useRoomStore(state => state.deck);
+	const currentRound = useRoomStore(state => state.currentRound);
+	const previousRounds = useRoomStore(state => state.previousRounds);
+	const localGuest = useRoomStore(state => state.localGuest);
+	const remoteGuests = useRoomStore(state => state.remoteGuests);
+
+	const allGuests = useMemo(() => [localGuest, ...remoteGuests], [localGuest, remoteGuests]);
+	const votes = useMemo(() =>
+		getDisplayedVotes(historySelectedRoundIndex, currentRound, previousRounds, allGuests, deck),
+		[historySelectedRoundIndex, currentRound, previousRounds, allGuests, deck]
+	);
+
 	const toggleVoteResults = () => {
 		setIsVoteResultsOpen(!useRoomStore.getState().isVoteResultsOpen);
 	}

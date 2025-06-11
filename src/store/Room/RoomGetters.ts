@@ -51,4 +51,25 @@ const getGroupedVotes = (gameRound: GameRound, deck: Deck, guests: Guest[]) => {
 	return Object.values(groupedVotes);
 }
 
-export { getVotesStateFromRound, getResultFromRound, getRoundsResults, getIsReadyToReveal, getGuestVoteValue, getGroupedVotes };
+const getDisplayedVotes = (
+	historySelectedRoundIndex: number | null,
+	currentRound: GameRound,
+	previousRounds: GameRound[],
+	guests: Guest[],
+	deck: Deck
+) => {
+	if (historySelectedRoundIndex === null) {
+		return getVotesStateFromRound(currentRound, guests, deck);
+	}
+	return getVotesStateFromRound(previousRounds[historySelectedRoundIndex], guests, deck);
+};
+
+export {
+	getVotesStateFromRound,
+	getResultFromRound,
+	getRoundsResults,
+	getIsReadyToReveal,
+	getGuestVoteValue,
+	getGroupedVotes,
+	getDisplayedVotes
+};

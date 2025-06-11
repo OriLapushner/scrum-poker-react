@@ -35,6 +35,8 @@ interface RoomStore extends RoomState {
     handleCardsRevealed: () => void;
     handleNewRoundStarted: () => void;
     handleGuestDisconnected: (guestId: string) => void;
+    handleGuestChanged: (guest: Partial<Guest> & Pick<Guest, 'id'>) => void;
+    handleGuestReconnected: (guestId: string) => void;
     subscribeToEvents: (socket: Socket) => void;
 
     // Complex actions
@@ -45,6 +47,8 @@ interface RoomStore extends RoomState {
     vote: (value: number | null) => void;
     revealCards: () => void;
     startNewRound: () => void;
+    setLocalGuestAsSpectator: (value: boolean) => Promise<void>;
+    changeLocalGuestName: (name: string) => Promise<void>;
 }
 
 const INITIAL_STATE: RoomState = {
@@ -52,7 +56,7 @@ const INITIAL_STATE: RoomState = {
     socket: null,
     remoteGuests: [],
     deck: { name: '', cards: [] },
-    localGuest: { name: "Guest", isConnected: true, id: 'local', isInRound: false },
+    localGuest: { name: "Guest", isConnected: true, id: 'local', isInRound: false, isSpectator: false },
     currentRound: [],
     previousRounds: [],
     roomId: null,
@@ -131,14 +135,50 @@ export const useRoomStore = create<RoomStore>()(
                 set({ remoteGuests: [...filteredGuests, guest], currentRound: updatedCurrentRound })
             }
         },
+        handleGuestChanged: (guestUpdate: Partial<Guest> & Pick<Guest, 'id'>) => {
+            console.log('handleGuestChanged', guestUpdate)
+            const state = get();
+            const updatedGuests = state.remoteGuests.map(remoteGuest =>
+                remoteGuest.id === guestUpdate.id ? { ...remoteGuest, ...guestUpdate } : remoteGuest
+            );
+            if (guestUpdate.isSpectator) {
+                const updatedCurrentRound = state.currentRound.filter(vote => vote.guestId !== guestUpdate.id);
+                set({ currentRound: updatedCurrentRound })
+            }
+            if (guestUpdate.isSpectator === false) {
+                const updatedCurrentRound = [...state.currentRound, { guestId: guestUpdate.id, voteValue: null }]
+                set({ currentRound: updatedCurrentRound })
+            }
+            set({ remoteGuests: updatedGuests });
+        },
+        handleGuestReconnected: (guestId: string) => {
+            const state = get();
+            const guest = state.remoteGuests.find(guest => guest.id === guestId)
+            if (!guest) return;
+            guest.isConnected = true;
+            guest.isInRound = !state.isRevealed;
+            if (!state.isRevealed) {
+                guest.isSpectator = true;
+            }
+            const updatedCurrentRound = state.currentRound.filter(vote => vote.guestId !== guestId);
+            if (!state.isRevealed) {
+                updatedCurrentRound.push({ guestId, voteValue: null });
+            }
+            const remoteFilteredGuests = state.remoteGuests.filter(guest => guest.id !== guestId);
+            set({ remoteGuests: [...remoteFilteredGuests, guest], currentRound: updatedCurrentRound });
+
+        },
 
         subscribeToEvents: (socket: Socket) => {
-            socket.on('guest_joined', get().handleGuestJoined);
-            socket.on('guest_left', get().handleGuestLeft);
-            socket.on('guest_voted', get().handleGuestVoted);
-            socket.on('cards_revealed', get().handleCardsRevealed);
-            socket.on('new_round_started', get().handleNewRoundStarted);
-            socket.on('guest_disconnected', get().handleGuestDisconnected)
+            const state = get();
+            socket.on('guest_joined', state.handleGuestJoined);
+            socket.on('guest_left', state.handleGuestLeft);
+            socket.on('guest_voted', state.handleGuestVoted);
+            socket.on('cards_revealed', state.handleCardsRevealed);
+            socket.on('new_round_started', state.handleNewRoundStarted);
+            socket.on('guest_disconnected', state.handleGuestDisconnected)
+            socket.on('guest_changed', state.handleGuestChanged)
+            socket.on('guest_reconnected', state.handleGuestReconnected)
         },
 
         // Complex actions
@@ -207,7 +247,7 @@ export const useRoomStore = create<RoomStore>()(
                         previousRounds: response.previousRounds
                     });
 
-                    get().subscribeToEvents(socket);
+                    state.subscribeToEvents(socket);
                     resolve();
                 });
             });
@@ -229,7 +269,7 @@ export const useRoomStore = create<RoomStore>()(
                         reject(new Error(`Rejoin room failed: ${response.error}`));
                         return;
                     }
-
+                    console.log('rejoin room response', response)
                     set({
                         roomId,
                         isRevealed: response.isReaveled,
@@ -258,7 +298,11 @@ export const useRoomStore = create<RoomStore>()(
             const state = get();
             const localGuestId = state.localGuest.id;
             state.setCurrentRoundVote({ voteValue: payload, guestId: localGuestId });
-            state.socket?.emit('vote', payload);
+            state.socket?.emit('vote', payload, (response: { error: string }) => {
+                if (response.error) {
+                    console.log('vote failed', response.error)
+                }
+            });
         },
 
         revealCards: () => {
@@ -287,5 +331,39 @@ export const useRoomStore = create<RoomStore>()(
                 });
             });
         },
+        setLocalGuestAsSpectator: (value: boolean) => {
+            return new Promise<void>((resolve, reject) => {
+                const state = get();
+                state.socket?.emit('set_guest_spectator_status', value, (response: { error: string }) => {
+                    if (response.error) {
+                        return reject(new Error(`Set local guest as spectator failed: ${response.error}`));
+                    }
+                    console.log('successfully set local guest as spectator')
+                    const updatedLocalGuest = { ...state.localGuest, isSpectator: value }
+                    if (value) {
+                        const updatedCurrentRound = state.currentRound.filter(vote => vote.guestId !== state.localGuest.id);
+                        set({ currentRound: updatedCurrentRound, localGuest: updatedLocalGuest })
+                    }
+                    else {
+                        const updatedCurrentRound = [...state.currentRound, { guestId: state.localGuest.id, voteValue: null }]
+                        set({ currentRound: updatedCurrentRound, localGuest: updatedLocalGuest })
+                    }
+                    resolve();
+                });
+            })
+        },
+        changeLocalGuestName: (name: string) => {
+            return new Promise<void>((resolve, reject) => {
+                const state = get();
+                state.socket?.emit('set_guest_name', name, (response: { error: string }) => {
+                    if (response.error) {
+                        return reject(new Error(`Change local guest name failed: ${response.error}`));
+                    }
+                    const updatedLocalGuest = { ...state.localGuest, name }
+                    set({ localGuest: updatedLocalGuest })
+                    resolve();
+                });
+            })
+        }
     }),
 );

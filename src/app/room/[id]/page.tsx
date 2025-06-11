@@ -3,7 +3,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { useRoomStore } from '@/store/Room/Room';
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast"
-import { JoinRoomLink } from "@/components/JoinRoomLink";
 import { RoomDeck } from '@/components/RoomDeck';
 import { JoinRoomMenu } from '@/components/JoinRoomMenu';
 import { useState, useMemo, useEffect } from 'react';
@@ -11,12 +10,10 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { MobileRoomLayout } from '@/components/MobileRoomLayout';
 import { DesktopRoomLayout } from '@/components/DesktopRoomLayout';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import {
-	getVotesStateFromRound, getRoundsResults, getResultFromRound,
-	getGuestVoteValue
-} from '@/store/Room/RoomGetters';
+import { getRoundsResults, getResultFromRound } from '@/store/Room/RoomGetters';
 import { useLocalStorageRoomsStore } from '@/store/localStorageRooms';
 import { VoteResults } from '@/components/VoteResults';
+import { RoomHeader } from '@/components/RoomHeader';
 
 const isRoomInLocalStorage = (roomId: string) => {
 	const localStorageRooms = useLocalStorageRoomsStore.getState().rooms
@@ -27,7 +24,6 @@ const isRoomInLocalStorage = (roomId: string) => {
 const ScrumPokerLayout = () => {
 	const params = useParams();
 	const roomId = typeof params.id === 'string' ? params.id : '';
-	const [roomLink, setRoomLink] = useState('');
 	const [isLoading, setIsLoading] = useState(true);
 	const [shouldShowJoinMenu, setShouldShowJoinMenu] = useState(false);
 
@@ -35,7 +31,6 @@ const ScrumPokerLayout = () => {
 	const { toast } = useToast();
 
 	const deck = useRoomStore(state => state.deck);
-	const roomName = useRoomStore(state => state.roomName);
 	const roomIdFromStore = useRoomStore(state => state.roomId);
 	const currentRound = useRoomStore(state => state.currentRound);
 	const previousRounds = useRoomStore(state => state.previousRounds);
@@ -46,21 +41,10 @@ const ScrumPokerLayout = () => {
 	const historySelectedRoundIndex = useRoomStore(state => state.historySelectedRoundIndex);
 	const setHistorySelectedRoundIndex = useRoomStore(state => state.setHistorySelectedRoundIndex);
 
-	const localGuestVoteValue = getGuestVoteValue(localGuest, currentRound);
 	const currentRoundResults = useMemo(() => getResultFromRound(currentRound, deck), [currentRound, deck]);
 	const allGuests = useMemo(() => [localGuest, ...remoteGuests], [localGuest, remoteGuests]);
-	const previousRoundsResults = useMemo(() => getRoundsResults(previousRounds, deck), [previousRounds, deck])
-	const currentRoundVotesState = useMemo(() => {
-		return getVotesStateFromRound(currentRound, allGuests, deck)
-	}, [currentRound, allGuests, deck]);
+	const previousRoundsResults = useMemo(() => getRoundsResults(previousRounds, deck), [previousRounds, deck]);
 
-	// Determine which votes to display based on selection
-	const displayedVotes = useMemo(() => {
-		if (historySelectedRoundIndex === null) return currentRoundVotesState;
-		return getVotesStateFromRound(previousRounds[historySelectedRoundIndex], allGuests, deck);
-	}, [historySelectedRoundIndex, currentRoundVotesState, previousRounds, allGuests, deck]);
-
-	const vote = useRoomStore(state => state.vote);
 	const joinRoom = useRoomStore(state => state.join);
 
 	const displayedResults = historySelectedRoundIndex !== null
@@ -70,14 +54,7 @@ const ScrumPokerLayout = () => {
 	const isViewingHistory = historySelectedRoundIndex !== null;
 	const isMobile = useMediaQuery('(max-width: 1023px)');
 
-	// Set up room link after component mounts in browser
-	useEffect(() => {
-		const domain = window?.location?.host || '';
-		const protocol = window?.location?.protocol || 'https:';
-		setRoomLink(`${protocol}//${domain}/room/${roomId}`);
-	}, [roomId]);
-
-	// Check localStorage on client side only
+	// check if the room is in local storage
 	useEffect(() => {
 		const localStorageRooms = useLocalStorageRoomsStore.getState().rooms;
 		const roomToJoin = localStorageRooms[roomId];
@@ -110,13 +87,6 @@ const ScrumPokerLayout = () => {
 		}
 	};
 
-	const handleCardClicked = (idx: number) => {
-		if (localGuestVoteValue === idx) {
-			vote(null);
-		}
-		else vote(idx);
-	}
-
 	const handleRoundSelect = (index: number) => {
 		// If already selected, deselect it (toggle behavior)
 		if (historySelectedRoundIndex === index) {
@@ -148,46 +118,43 @@ const ScrumPokerLayout = () => {
 	}
 
 	return (
-		<div className="min-h-screen w-full bg-slate-50 p-4 md:p-8 flex flex-col lg:pb-8">
-			<div className="flex flex-col sm:flex-row justify-between items-center mb-4 md:mb-8 pb-4 border-b border-slate-200">
-				<span className="text-xl md:text-2xl font-bold text-slate-800">{roomName}</span>
-				<JoinRoomLink roomLink={roomLink} />
+		<div className="min-h-screen w-full bg-slate-50">
+			<RoomHeader />
+			<div className='px-4 md:px-8 flex flex-col lg:pb-8'>
+				{isMobile ? (
+					<MobileRoomLayout
+						isViewingHistory={isViewingHistory}
+						selectedRoundIndex={historySelectedRoundIndex}
+						displayedResults={displayedResults}
+						allGuests={allGuests}
+						previousRoundsResults={previousRoundsResults}
+						setSelectedRoundIndex={setHistorySelectedRoundIndex}
+						handleRoundSelect={handleRoundSelect}
+					/>
+				) : (
+					<DesktopRoomLayout
+						isViewingHistory={isViewingHistory}
+						selectedRoundIndex={historySelectedRoundIndex}
+						displayedResults={displayedResults}
+						allGuests={allGuests}
+						previousRoundsResults={previousRoundsResults}
+						setSelectedRoundIndex={setHistorySelectedRoundIndex}
+						handleRoundSelect={handleRoundSelect}
+					/>
+				)}
+				<VoteResults
+					className='w-xlg max-w-[90vw] h-72 max-h-[80vh] m-auto'
+				/>
+
+				<div className="z-10 absolute bottom-0 left-0 right-0">
+					<ScrollArea className="w-full overflow-x-auto">
+						<RoomDeck />
+						<ScrollBar orientation="horizontal" />
+					</ScrollArea>
+				</div>
+				<Toaster />
 			</div>
 
-			{isMobile ? (
-				<MobileRoomLayout
-					isViewingHistory={isViewingHistory}
-					selectedRoundIndex={historySelectedRoundIndex}
-					displayedVotes={displayedVotes}
-					displayedResults={displayedResults}
-					allGuests={allGuests}
-					previousRoundsResults={previousRoundsResults}
-					setSelectedRoundIndex={setHistorySelectedRoundIndex}
-					handleRoundSelect={handleRoundSelect}
-				/>
-			) : (
-				<DesktopRoomLayout
-					isViewingHistory={isViewingHistory}
-					selectedRoundIndex={historySelectedRoundIndex}
-					displayedVotes={displayedVotes}
-					displayedResults={displayedResults}
-					allGuests={allGuests}
-					previousRoundsResults={previousRoundsResults}
-					setSelectedRoundIndex={setHistorySelectedRoundIndex}
-					handleRoundSelect={handleRoundSelect}
-				/>
-			)}
-			<VoteResults
-				className='w-xlg max-w-[90vw] h-72 max-h-[80vh] m-auto'
-			/>
-
-			<div className="z-10 absolute bottom-0 left-0 right-0">
-				<ScrollArea className="w-full overflow-x-auto">
-					<RoomDeck isDisabled={!localGuest.isInRound} deck={deck} selectedCard={localGuestVoteValue} onCardClicked={handleCardClicked} />
-					<ScrollBar orientation="horizontal" />
-				</ScrollArea>
-			</div>
-			<Toaster />
 		</div>
 	);
 };

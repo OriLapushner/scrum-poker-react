@@ -9,7 +9,6 @@ import { RoomControls } from './RoomControls';
 interface DesktopRoomLayoutProps {
 	isViewingHistory: boolean;
 	selectedRoundIndex: number | null;
-	displayedVotes: VoteEntry[];
 	displayedResults: GameRoundResult | null;
 	allGuests: Guest[];
 	previousRoundsResults: GameRoundResult[];
@@ -20,7 +19,6 @@ interface DesktopRoomLayoutProps {
 export const DesktopRoomLayout = ({
 	isViewingHistory,
 	selectedRoundIndex,
-	displayedVotes,
 	displayedResults,
 	allGuests,
 	previousRoundsResults,
@@ -65,7 +63,6 @@ export const DesktopRoomLayout = ({
 					)}
 
 					<RoomTable
-						votes={displayedVotes}
 						currentRoundResult={displayedResults || { result: 0 }}
 					/>
 					<RoomControls />
