@@ -86,11 +86,33 @@ export function Header() {
 
 	const isActive = (section: string) => activeSection === section
 
+	const handleSectionClick = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
+		e.preventDefault()
+		setMobileMenuOpen(false) // Close mobile menu if open
+
+		if (sectionId === "home") {
+			window.scrollTo({ top: 0, behavior: 'smooth' })
+		} else {
+			const element = document.getElementById(sectionId)
+			if (element) {
+				const headerOffset = 64
+				const elementPosition = element.getBoundingClientRect().top
+				const offsetPosition = elementPosition + window.scrollY - headerOffset
+
+				window.scrollTo({
+					top: offsetPosition,
+					behavior: 'smooth'
+				})
+			}
+		}
+	}
+
 	const desktopMenu = (
 		<nav className="hidden lg:flex flex-1 justify-center">
 			<div className="flex space-x-8">
 				<a
 					href="#"
+					onClick={(e) => handleSectionClick(e, "home")}
 					className={`inline-flex items-center border-b-2 pt-1 text-sm font-medium ${isActive("home")
 						? "border-primary-700 text-gray-900"
 						: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
@@ -100,6 +122,7 @@ export function Header() {
 				</a>
 				<a
 					href="#features"
+					onClick={(e) => handleSectionClick(e, "features")}
 					className={`inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium ${isActive("features")
 						? "border-primary-700 text-gray-900"
 						: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
@@ -109,6 +132,7 @@ export function Header() {
 				</a>
 				<a
 					href="#how-it-works"
+					onClick={(e) => handleSectionClick(e, "how-it-works")}
 					className={`inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium ${isActive("how-it-works")
 						? "border-primary-700 text-gray-900"
 						: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
@@ -118,6 +142,7 @@ export function Header() {
 				</a>
 				<a
 					href="#why-scrum-poker"
+					onClick={(e) => handleSectionClick(e, "why-scrum-poker")}
 					className={`inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium ${isActive("why-scrum-poker")
 						? "border-primary-700 text-gray-900"
 						: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
@@ -134,6 +159,7 @@ export function Header() {
 			<div className="space-y-1 pb-3 pt-2">
 				<a
 					href="#"
+					onClick={(e) => handleSectionClick(e, "home")}
 					className={`block border-l-4 py-2 pl-4 pr-3 text-base font-medium ${isActive("home")
 						? "border-primary-600 bg-primary-50/80 text-gray-700"
 						: "border-transparent text-gray-700"
@@ -143,6 +169,7 @@ export function Header() {
 				</a>
 				<a
 					href="#features"
+					onClick={(e) => handleSectionClick(e, "features")}
 					className={`block border-l-4 py-2 pl-4 pr-3 text-base font-medium ${isActive("features")
 						? "border-primary-600 bg-primary-50/80 text-gray-700"
 						: "border-transparent text-gray-700"
@@ -152,6 +179,7 @@ export function Header() {
 				</a>
 				<a
 					href="#how-it-works"
+					onClick={(e) => handleSectionClick(e, "how-it-works")}
 					className={`block border-l-4 py-2 pl-4 pr-3 text-base font-medium ${isActive("how-it-works")
 						? "border-primary-600 bg-primary-50/80 text-gray-700"
 						: "border-transparent text-gray-700"
@@ -161,6 +189,7 @@ export function Header() {
 				</a>
 				<a
 					href="#why-scrum-poker"
+					onClick={(e) => handleSectionClick(e, "why-scrum-poker")}
 					className={`block border-l-4 py-2 pl-4 pr-3 text-base font-medium ${isActive("why-scrum-poker")
 						? "border-primary-600 bg-primary-50/80 text-gray-700"
 						: "border-transparent text-gray-700"
