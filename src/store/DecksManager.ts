@@ -12,12 +12,10 @@ interface DecksManagerState {
 	userDecks: Deck[];
 	selectedDeckIdx: number | null,
 	defaultDecks: Deck[],
-	cardDisplayName: string,
-	cardValue: string
+	cardsInput: string
 }
 
 interface DecksManagerStore extends DecksManagerState {
-	addCard: (card: Card) => void
 	deleteCard: (index: number) => void
 	addUserDeck: (deck: Deck) => void
 	deleteDeck: (index: number) => void
@@ -26,16 +24,14 @@ interface DecksManagerStore extends DecksManagerState {
 	setSelectedDeck: (index: number | null) => void
 	resetDeckCreation: () => void
 	setDeckName: (name: string) => void
-	setCardValue: (value: string) => void
-	setCardDisplayName: (name: string) => void
+	setCardsInput: (input: string) => void
 	getAllDecks: () => Deck[]
 }
 
 const INITIAL_STATE: DecksManagerState = {
 	cards: [],
 	deckName: '',
-	cardDisplayName: '',
-	cardValue: '',
+	cardsInput: '',
 	defaultDecks: getDefaultDecks(),
 	userDecks: [],
 	selectedDeckIdx: 0,
@@ -46,13 +42,15 @@ export const useDecksManagerStore = create<DecksManagerStore>()(
 		(set, get) => ({
 			...INITIAL_STATE,
 
-			addCard: (card) =>
-				set((state) => ({ cards: [...state.cards, card] })),
-
 			deleteCard: (index) =>
-				set((state) => ({
-					cards: state.cards.filter((_, idx) => idx !== index)
-				})),
+				set((state) => {
+					const newCards = state.cards.filter((_, idx) => idx !== index)
+					const newCardsInput = newCards.map(card => card.displayName).join(',')
+					return {
+						cards: newCards,
+						cardsInput: newCardsInput
+					}
+				}),
 
 			addUserDeck: (deck) =>
 				set((state) => ({ userDecks: [...state.userDecks, deck] })),
@@ -65,9 +63,18 @@ export const useDecksManagerStore = create<DecksManagerStore>()(
 
 			setDeckName: (name) => set({ deckName: name }),
 
-			setCardValue: (value) => set({ cardValue: value }),
-
-			setCardDisplayName: (name) => set({ cardDisplayName: name }),
+			setCardsInput: (input) => {
+				const cards = input
+					.split(',')
+					.map(str => str.trim())
+					.filter(str => str !== '')
+					.map(str => {
+						const num = Number(str)
+						return isNaN(num) ? null : { displayName: str, value: num }
+					})
+					.filter((card): card is Card => card !== null)
+				set({ cardsInput: input, cards })
+			},
 
 			createDeck: (deck) => {
 				const state = get()
@@ -82,15 +89,19 @@ export const useDecksManagerStore = create<DecksManagerStore>()(
 				set({ userDecks: newDecks })
 			},
 
-			resetDeckCreation: () => set({ cards: [] }),
+			resetDeckCreation: () => set({ cards: [], cardsInput: '' }),
 
 			setSelectedDeck: (index) => {
 				const state = get()
 				//null set decks to creation mode
-				if (index === null) return set({ selectedDeckIdx: null, cards: [] })
+				if (index === null) return set({ selectedDeckIdx: null, cards: [], cardsInput: '' })
+				const selectedDeck = state.userDecks[index]
+				const cards = selectedDeck?.cards || []
+				const cardsInput = cards.map(card => card.displayName).join(',')
 				set({
 					selectedDeckIdx: index,
-					cards: state.userDecks[index]?.cards || []
+					cards,
+					cardsInput
 				})
 			},
 
