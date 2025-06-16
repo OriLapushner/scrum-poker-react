@@ -162,8 +162,8 @@ export const CreateDeckMenu: React.FC<CreateDeckMenuProps> = ({ onClose }) => {
 				<h3 className="text-md sm:text-lg font-semibold mb-3 sm:mb-4">Cards in Deck</h3>
 				<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-3">
 					{cards.map((card, index) => (
-						<div key={index} className="relative group hover:shadow-md transition-shadow border border-gray-200 rounded-md p-2 w-20 h-28">
-							<div className="text-xl sm:text-2xl md:text-3xl flex items-center justify-center h-full">{card.displayName}</div>
+						<div key={index} className="relative group hover:shadow-md hover:shadow-primary-500/20 transition-shadow border border-primary-400 rounded-md p-2 w-20 h-28">
+							<div className="text-xl sm:text-2xl md:text-3xl flex items-center justify-center h-full text-primary-900">{card.displayName}</div>
 							<Button
 								variant="ghost"
 								size="icon"
@@ -177,14 +177,23 @@ export const CreateDeckMenu: React.FC<CreateDeckMenuProps> = ({ onClose }) => {
 				</div>
 			</div>
 
-			<Button
-				onClick={handleCreateOrUpdateDeck}
-				className="mt-4 sm:mt-6"
-				size="lg"
-				disabled={!deckName || cards.length === 0}
-			>
-				{selectedDeckIdx !== null ? "Update Deck" : "Create Deck"}
-			</Button>
+			<div className="mt-4 sm:mt-6 flex gap-3 justify-center">
+				<Button
+					onClick={onClose}
+					variant="outline"
+					size="lg"
+				>
+					Close
+				</Button>
+				<Button
+					className="bg-primary-600 hover:bg-primary-700"
+					onClick={handleCreateOrUpdateDeck}
+					size="lg"
+					disabled={!deckName || cards.length === 0}
+				>
+					{selectedDeckIdx !== null ? "Update Deck" : "Create Deck"}
+				</Button>
+			</div>
 		</div>
 	)
 }
