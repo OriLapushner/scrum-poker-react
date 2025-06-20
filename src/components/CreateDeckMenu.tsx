@@ -76,17 +76,13 @@ export const CreateDeckMenu: React.FC<CreateDeckMenuProps> = ({ onClose }) => {
 	}
 
 	return (
-		<div className="w-full max-w-3xl flex flex-col items-center">
-			<div className="flex justify-between items-center">
-				<h2 className="text-xl sm:text-2xl font-bold">Create/Edit Deck</h2>
-			</div>
-
-			<div className="space-y-4">
+		<div className="w-full flex flex-col items-center">
+			<div className="grid grid-cols-1 gap-8">
 				<div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-					<div className="flex-1">
+					<div>
 						<Label>Select Deck to Edit</Label>
 						<Select onValueChange={handleDeckSelect} value={selectedDeckIdx?.toString() || ""}>
-							<SelectTrigger>
+							<SelectTrigger className="sm:min-w-52">
 								<SelectValue placeholder="Create new deck" />
 							</SelectTrigger>
 							<SelectContent>
@@ -105,7 +101,6 @@ export const CreateDeckMenu: React.FC<CreateDeckMenuProps> = ({ onClose }) => {
 							<AlertDialog>
 								<AlertDialogTrigger asChild>
 									<Button variant="destructive" className="w-full sm:w-auto">
-										<Trash2 className="h-4 w-4 mr-2" />
 										Delete Deck
 									</Button>
 								</AlertDialogTrigger>
@@ -135,7 +130,7 @@ export const CreateDeckMenu: React.FC<CreateDeckMenuProps> = ({ onClose }) => {
 					)}
 				</div>
 
-				<div>
+				<div className="flex flex-col gap-2 w-full">
 					<Label htmlFor="deckName">Deck Name</Label>
 					<Input
 						id="deckName"
@@ -146,8 +141,8 @@ export const CreateDeckMenu: React.FC<CreateDeckMenuProps> = ({ onClose }) => {
 					/>
 				</div>
 
-				<div>
-					<Label htmlFor="cardsInput">Cards (comma-separated numbers)</Label>
+				<div className="flex flex-col gap-2 w-full justify-center">
+					<Label htmlFor="cardsInput">Cards (comma-separated)</Label>
 					<Input
 						id="cardsInput"
 						value={cardsInput}

@@ -170,7 +170,7 @@ export default function CreateGameMenu() {
 						</Button>
 					</DialogTrigger>
 					<DialogContent aria-description='create / edit scrum poker decks' className="max-w-4xl">
-						<DialogTitle className='sr-only'>Create / Edit Custom Deck</DialogTitle>
+						<DialogTitle>Create / Edit Custom Deck</DialogTitle>
 						<CreateDeckMenu onClose={() => setIsEditorOpen(false)} />
 					</DialogContent>
 				</Dialog>
