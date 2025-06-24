@@ -25,8 +25,8 @@ const getRoundsResults = (rounds: GameRound[], deck: Deck) => {
 	return rounds.map(round => getResultFromRound(round, deck));
 }
 
-const getIsReadyToReveal = (currentRound: GameRound) => {
-	return !currentRound.some(vote => vote.voteValue === null);
+const getIsRevealDisabled = (currentRound: GameRound) => {
+	return !currentRound.some(vote => vote.voteValue === null) && currentRound.length > 0;
 }
 
 const getGuestVoteValue = (guest: Guest, round: GameRound) => {
@@ -68,7 +68,7 @@ export {
 	getVotesStateFromRound,
 	getResultFromRound,
 	getRoundsResults,
-	getIsReadyToReveal,
+	getIsRevealDisabled,
 	getGuestVoteValue,
 	getGroupedVotes,
 	getDisplayedVotes

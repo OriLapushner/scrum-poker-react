@@ -1,14 +1,14 @@
 import { HTMLAttributes, useMemo } from "react";
 import { PulsatingButton } from "./magicui/pulsating-button";
 import { Button } from "./ui/button";
-import { getIsReadyToReveal } from "@/store/Room/RoomGetters";
+import { getIsRevealDisabled } from "@/store/Room/RoomGetters";
 import { useRoomStore } from "@/store/Room/Room";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 export const RoomControls: React.FC<HTMLAttributes<HTMLDivElement>> = ({ className }) => {
 	const currentRound = useRoomStore(state => state.currentRound);
-	const isReadyToReveal = useMemo(() => getIsReadyToReveal(currentRound), [currentRound]);
+	const isRevealDisabled = useMemo(() => getIsRevealDisabled(currentRound), [currentRound]);
 	const historySelectedRoundIndex = useRoomStore(state => state.historySelectedRoundIndex);
 	const isViewingHistory = historySelectedRoundIndex !== null;
 	const isRevealed = useRoomStore(state => state.isRevealed);
@@ -34,8 +34,8 @@ export const RoomControls: React.FC<HTMLAttributes<HTMLDivElement>> = ({ classNa
 				<PulsatingButton
 					onClick={handleRevealCardClicked}
 					className="bg-primary-800 hover:bg-primary-900 mt-4 w-28"
-					disabled={!isReadyToReveal}
-					isPulsating={isReadyToReveal}
+					disabled={!isRevealDisabled}
+					isPulsating={isRevealDisabled}
 				>
 					Reveal Votes
 				</PulsatingButton>
