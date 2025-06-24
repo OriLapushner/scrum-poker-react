@@ -1,4 +1,4 @@
-import React, { type HTMLAttributes, useState } from 'react';
+import React, { type HTMLAttributes, useMemo, useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { useRoomStore } from '@/store/Room/Room';
 import {
@@ -8,7 +8,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from '@/lib/utils';
-import { getGuestVoteValue } from '@/store/Room/RoomGetters';
+import { getGuestVoteValue, getIsDeckDisabled } from '@/store/Room/RoomGetters';
 
 export const RoomDeck: React.FC<HTMLAttributes<HTMLDivElement>> = ({ className }) => {
 	const localGuest = useRoomStore(state => state.localGuest);
@@ -16,11 +16,10 @@ export const RoomDeck: React.FC<HTMLAttributes<HTMLDivElement>> = ({ className }
 	const isRevealed = useRoomStore(state => state.isRevealed);
 	const deck = useRoomStore(state => state.deck);
 	const vote = useRoomStore(state => state.vote);
+	const isDeckDisabled = useMemo(() => getIsDeckDisabled(isRevealed, localGuest), [isRevealed, localGuest]);
 	const localGuestVoteValue = getGuestVoteValue(localGuest, currentRound);
 
 	const [openTooltipIndex, setOpenTooltipIndex] = useState<number | null>(null);
-
-	const isDisabled = !localGuest.isInRound || isRevealed;
 
 	const handleCardClicked = (idx: number) => {
 		if (!localGuest.isInRound) {
@@ -47,18 +46,18 @@ export const RoomDeck: React.FC<HTMLAttributes<HTMLDivElement>> = ({ className }
 									flex items-center justify-center 
 									text-base md:text-xl font-bold
 									transition-all duration-200
-									${isDisabled ?
+									${isDeckDisabled ?
 										'opacity-60 cursor-not-allowed' :
 										'cursor-pointer'}
 									${localGuestVoteValue === index ?
 										'bg-primary-400 -translate-y-2 shadow-lg hover:bg-primary-500' :
-										isDisabled ? 'hover:bg-primary-400/60' : ''}
+										isDeckDisabled ? 'hover:bg-primary-400/60' : ''}
 								`}
 							>
 								{card.displayName}
 							</Card>
 						</TooltipTrigger>
-						{isDisabled && (
+						{isDeckDisabled && (
 							<TooltipContent className='bg-primary-500 text-white'>
 								<p>Can&apos;t vote this round</p>
 							</TooltipContent>

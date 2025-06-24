@@ -64,6 +64,10 @@ const getDisplayedVotes = (
 	return getVotesStateFromRound(previousRounds[historySelectedRoundIndex], guests, deck);
 };
 
+const getIsDeckDisabled = (isRevealed: boolean, localGuest: Guest) => {
+	return isRevealed || !localGuest.isInRound || localGuest.isSpectator;
+}
+
 export {
 	getVotesStateFromRound,
 	getResultFromRound,
@@ -71,5 +75,6 @@ export {
 	getIsRevealDisabled,
 	getGuestVoteValue,
 	getGroupedVotes,
-	getDisplayedVotes
+	getDisplayedVotes,
+	getIsDeckDisabled
 };
