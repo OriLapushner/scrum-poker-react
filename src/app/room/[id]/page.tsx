@@ -34,15 +34,12 @@ const ScrumPokerLayout = () => {
 	const roomIdFromStore = useRoomStore(state => state.roomId);
 	const currentRound = useRoomStore(state => state.currentRound);
 	const previousRounds = useRoomStore(state => state.previousRounds);
-	const localGuest = useRoomStore(state => state.localGuest);
-	const remoteGuests = useRoomStore(state => state.remoteGuests);
 	const rejoinRoom = useRoomStore(state => state.rejoinRoom);
 	const leaveRoom = useRoomStore(state => state.leaveRoom);
 	const historySelectedRoundIndex = useRoomStore(state => state.historySelectedRoundIndex);
 	const setHistorySelectedRoundIndex = useRoomStore(state => state.setHistorySelectedRoundIndex);
 
 	const currentRoundResults = useMemo(() => getResultFromRound(currentRound, deck), [currentRound, deck]);
-	const allGuests = useMemo(() => [localGuest, ...remoteGuests], [localGuest, remoteGuests]);
 	const previousRoundsResults = useMemo(() => getRoundsResults(previousRounds, deck), [previousRounds, deck]);
 
 	const joinRoom = useRoomStore(state => state.join);
@@ -126,7 +123,6 @@ const ScrumPokerLayout = () => {
 						isViewingHistory={isViewingHistory}
 						selectedRoundIndex={historySelectedRoundIndex}
 						displayedResults={displayedResults}
-						allGuests={allGuests}
 						previousRoundsResults={previousRoundsResults}
 						setSelectedRoundIndex={setHistorySelectedRoundIndex}
 						handleRoundSelect={handleRoundSelect}
@@ -136,7 +132,6 @@ const ScrumPokerLayout = () => {
 						isViewingHistory={isViewingHistory}
 						selectedRoundIndex={historySelectedRoundIndex}
 						displayedResults={displayedResults}
-						allGuests={allGuests}
 						previousRoundsResults={previousRoundsResults}
 						setSelectedRoundIndex={setHistorySelectedRoundIndex}
 						handleRoundSelect={handleRoundSelect}

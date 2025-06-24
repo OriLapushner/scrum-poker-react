@@ -10,7 +10,6 @@ interface DesktopRoomLayoutProps {
 	isViewingHistory: boolean;
 	selectedRoundIndex: number | null;
 	displayedResults: GameRoundResult | null;
-	allGuests: Guest[];
 	previousRoundsResults: GameRoundResult[];
 	setSelectedRoundIndex: (index: number | null) => void;
 	handleRoundSelect: (index: number) => void;
@@ -20,7 +19,6 @@ export const DesktopRoomLayout = ({
 	isViewingHistory,
 	selectedRoundIndex,
 	displayedResults,
-	allGuests,
 	previousRoundsResults,
 	setSelectedRoundIndex,
 	handleRoundSelect,
@@ -30,7 +28,6 @@ export const DesktopRoomLayout = ({
 			<div className="flex gap-4 justify-center w-full">
 				<RoomGuestList
 					className='min-w-56 w-1/5 max-w-64'
-					guests={allGuests}
 				/>
 
 				<div className="flex-grow flex flex-col justify-between items-center">

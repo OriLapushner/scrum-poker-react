@@ -12,7 +12,6 @@ interface MobileRoomLayoutProps {
 	isViewingHistory: boolean;
 	selectedRoundIndex: number | null;
 	displayedResults: GameRoundResult | null;
-	allGuests: Guest[];
 	previousRoundsResults: GameRoundResult[];
 	setSelectedRoundIndex: (index: number | null) => void;
 	handleRoundSelect: (index: number) => void;
@@ -22,7 +21,6 @@ export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 	isViewingHistory,
 	selectedRoundIndex,
 	displayedResults,
-	allGuests,
 	previousRoundsResults,
 	setSelectedRoundIndex,
 	handleRoundSelect,
@@ -98,7 +96,6 @@ export const MobileRoomLayout: React.FC<MobileRoomLayoutProps> = ({
 				<TabsContent value="participants" className="flex justify-center">
 					<RoomGuestList
 						className='w-full max-w-md'
-						guests={allGuests}
 					/>
 				</TabsContent>
 
