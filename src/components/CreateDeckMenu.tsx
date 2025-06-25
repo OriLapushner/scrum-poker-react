@@ -49,13 +49,19 @@ export const CreateDeckMenu: React.FC<CreateDeckMenuProps> = ({ onClose }) => {
 					description: `"${deckName}" has been updated.`,
 				})
 			} else {
-				createDeck({
-					name: deckName,
-					cards: cards,
-				})
-				toast.success("Deck created successfully", {
-					description: `"${deckName}" has been saved.`,
-				})
+				try {
+					createDeck({
+						name: deckName,
+						cards: cards,
+					})
+					toast.success("Deck created successfully", {
+						description: `"${deckName}" has been saved.`,
+					})
+				} catch (error) {
+					toast.error("Deck creation failed", {
+						description: `${error instanceof Error ? error.message : 'Unknown error'}`,
+					})
+				}
 			}
 		}
 	}

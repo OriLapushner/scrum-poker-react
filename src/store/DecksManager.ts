@@ -78,6 +78,15 @@ export const useDecksManagerStore = create<DecksManagerStore>()(
 
 			createDeck: (deck) => {
 				const state = get()
+				const allDecks = [...state.defaultDecks, ...state.userDecks]
+				const nameExists = allDecks.some(existingDeck =>
+					existingDeck.name.toLowerCase() === deck.name.toLowerCase()
+				)
+
+				if (nameExists) {
+					throw new Error(`A deck with the name "${deck.name}" already exists`)
+				}
+
 				set({ userDecks: [...state.userDecks, deck] })
 			},
 
