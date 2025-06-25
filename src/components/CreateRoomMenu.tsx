@@ -99,8 +99,8 @@ export default function CreateGameMenu() {
 				</CardDescription>
 			</CardHeader>
 
-			<CardContent>
-				<form onSubmit={handleSubmit} className="space-y-6">
+			<form onSubmit={handleSubmit}>
+				<CardContent className='space-y-6'>
 					<div className="space-y-2">
 						<Label htmlFor="roomName">Room Name</Label>
 						<div className="relative">
@@ -159,28 +159,29 @@ export default function CreateGameMenu() {
 							<Diamond className="absolute left-2.5 top-2 h-5 w-5 text-primary-600" />
 						</div>
 					</div>
-				</form>
-			</CardContent>
+				</CardContent>
 
-			<CardFooter className="flex flex-col gap-4">
-				<Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
-					<DialogTrigger asChild>
-						<Button variant="outline" className="w-full">
-							Create / Edit Custom Deck
-						</Button>
-					</DialogTrigger>
-					<DialogContent aria-description='create / edit scrum poker decks' className="max-w-4xl">
-						<DialogTitle>Create / Edit Custom Deck</DialogTitle>
-						<CreateDeckMenu onClose={() => setIsEditorOpen(false)} />
-					</DialogContent>
-				</Dialog>
-				<Button
-					onClick={handleSubmit}
-					className="w-full bg-primary-600 hover:bg-primary-700"
-				>
-					Create Room
-				</Button>
-			</CardFooter>
+				<CardFooter className="flex flex-col gap-4">
+					<Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
+						<DialogTrigger asChild>
+							<Button variant="outline" className="w-full">
+								Create / Edit Custom Deck
+							</Button>
+						</DialogTrigger>
+						<DialogContent aria-description='create / edit scrum poker decks' className="max-w-4xl">
+							<DialogTitle>Create / Edit Custom Deck</DialogTitle>
+							<CreateDeckMenu onClose={() => setIsEditorOpen(false)} />
+						</DialogContent>
+					</Dialog>
+					<Button
+						type='submit'
+						className="w-full bg-primary-600 hover:bg-primary-700"
+					>
+						Create Room
+					</Button>
+				</CardFooter>
+			</form>
+
 		</Card>
 	);
 }
