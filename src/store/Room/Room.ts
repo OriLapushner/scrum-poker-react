@@ -136,7 +136,6 @@ export const useRoomStore = create<RoomStore>()(
             }
         },
         handleGuestChanged: (guestUpdate: Partial<Guest> & Pick<Guest, 'id'>) => {
-            console.log('handleGuestChanged', guestUpdate)
             const state = get();
             const updatedGuests = state.remoteGuests.map(remoteGuest =>
                 remoteGuest.id === guestUpdate.id ? { ...remoteGuest, ...guestUpdate } : remoteGuest
@@ -269,7 +268,6 @@ export const useRoomStore = create<RoomStore>()(
                         reject(new Error(`Rejoin room failed: ${response.error}`));
                         return;
                     }
-                    console.log('rejoin room response', response)
                     set({
                         roomId,
                         isRevealed: response.isReaveled,
@@ -295,13 +293,14 @@ export const useRoomStore = create<RoomStore>()(
         },
 
         vote: (payload: VoteValue) => {
-            const state = get();
-            const localGuestId = state.localGuest.id;
-            state.setCurrentRoundVote({ voteValue: payload, guestId: localGuestId });
-            state.socket?.emit('vote', payload, (response: { error: string }) => {
-                if (response.error) {
-                    console.log('vote failed', response.error)
-                }
+            return new Promise<void>((resolve, reject) => {
+                const state = get();
+                const localGuestId = state.localGuest.id;
+                state.socket?.emit('vote', payload, (response: { error: string }) => {
+                    if (response.error) return reject(new Error(`Vote failed: ${response.error}`));
+                    state.setCurrentRoundVote({ voteValue: payload, guestId: localGuestId });
+                    resolve();
+                });
             });
         },
 
@@ -338,7 +337,6 @@ export const useRoomStore = create<RoomStore>()(
                     if (response.error) {
                         return reject(new Error(`Set local guest as spectator failed: ${response.error}`));
                     }
-                    console.log('successfully set local guest as spectator')
                     const updatedLocalGuest = { ...state.localGuest, isSpectator: value }
                     if (value) {
                         const updatedCurrentRound = state.currentRound.filter(vote => vote.guestId !== state.localGuest.id);

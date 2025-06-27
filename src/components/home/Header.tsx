@@ -2,6 +2,14 @@
 import { CardsIcon } from "@/components/ui/cards-icon"
 import { useState, useEffect, useRef } from "react"
 
+// Navigation data structure
+const navigationItems = [
+	{ id: "home", label: "Create Room", href: "#" },
+	{ id: "features", label: "Features", href: "#features" },
+	{ id: "why-scrum-poker", label: "Why ScrumPoker?", href: "#why-scrum-poker" },
+	{ id: "how-it-works", label: "How it works", href: "#how-it-works" },
+]
+
 export function Header() {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 	const [activeSection, setActiveSection] = useState("home")
@@ -12,7 +20,11 @@ export function Header() {
 	}, [activeSection])
 
 	useEffect(() => {
-		const sections = ["features", "how-it-works", "why-scrum-poker"]
+		// Extract section IDs (excluding "home" since it's not a scrollable section)
+		const sections = navigationItems
+			.filter(item => item.id !== "home")
+			.map(item => item.id)
+
 		let sectionElements: Array<{ id: string, element: HTMLElement, top: number, bottom: number }> = []
 
 		const calculateSectionPositions = () => {
@@ -110,46 +122,18 @@ export function Header() {
 	const desktopMenu = (
 		<nav className="hidden lg:flex flex-1 justify-center">
 			<div className="flex space-x-8">
-				<a
-					href="#"
-					onClick={(e) => handleSectionClick(e, "home")}
-					className={`inline-flex items-center border-b-2 pt-1 text-sm font-medium ${isActive("home")
-						? "border-primary-700 text-gray-900"
-						: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-						}`}
-				>
-					Create Room
-				</a>
-				<a
-					href="#features"
-					onClick={(e) => handleSectionClick(e, "features")}
-					className={`inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium ${isActive("features")
-						? "border-primary-700 text-gray-900"
-						: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-						}`}
-				>
-					Features
-				</a>
-				<a
-					href="#how-it-works"
-					onClick={(e) => handleSectionClick(e, "how-it-works")}
-					className={`inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium ${isActive("how-it-works")
-						? "border-primary-700 text-gray-900"
-						: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-						}`}
-				>
-					How it works
-				</a>
-				<a
-					href="#why-scrum-poker"
-					onClick={(e) => handleSectionClick(e, "why-scrum-poker")}
-					className={`inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium ${isActive("why-scrum-poker")
-						? "border-primary-700 text-gray-900"
-						: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-						}`}
-				>
-					Why ScrumPoker?
-				</a>
+				{navigationItems.map((item) => (
+					<a
+						key={item.id}
+						href={item.href}
+						onClick={(e) => handleSectionClick(e, item.id)}
+						className={`inline-flex items-center border-b-2 pt-1 text-sm font-medium ${isActive(item.id)
+							? "border-primary-700 text-gray-900"
+							: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"}`}
+					>
+						{item.label}
+					</a>
+				))}
 			</div>
 		</nav>
 	)
@@ -157,46 +141,19 @@ export function Header() {
 	const mobileMenu = (
 		<div className="lg:hidden">
 			<div className="space-y-1 pb-3 pt-2">
-				<a
-					href="#"
-					onClick={(e) => handleSectionClick(e, "home")}
-					className={`block border-l-4 py-2 pl-4 pr-3 text-base font-medium ${isActive("home")
-						? "border-primary-600 bg-primary-50/80 text-gray-700"
-						: "border-transparent text-gray-700"
-						}`}
-				>
-					Create Room
-				</a>
-				<a
-					href="#features"
-					onClick={(e) => handleSectionClick(e, "features")}
-					className={`block border-l-4 py-2 pl-4 pr-3 text-base font-medium ${isActive("features")
-						? "border-primary-600 bg-primary-50/80 text-gray-700"
-						: "border-transparent text-gray-700"
-						}`}
-				>
-					Features
-				</a>
-				<a
-					href="#how-it-works"
-					onClick={(e) => handleSectionClick(e, "how-it-works")}
-					className={`block border-l-4 py-2 pl-4 pr-3 text-base font-medium ${isActive("how-it-works")
-						? "border-primary-600 bg-primary-50/80 text-gray-700"
-						: "border-transparent text-gray-700"
-						}`}
-				>
-					How it works
-				</a>
-				<a
-					href="#why-scrum-poker"
-					onClick={(e) => handleSectionClick(e, "why-scrum-poker")}
-					className={`block border-l-4 py-2 pl-4 pr-3 text-base font-medium ${isActive("why-scrum-poker")
-						? "border-primary-600 bg-primary-50/80 text-gray-700"
-						: "border-transparent text-gray-700"
-						}`}
-				>
-					Why ScrumPoker?
-				</a>
+				{navigationItems.map((item) => (
+					<a
+						key={item.id}
+						href={item.href}
+						onClick={(e) => handleSectionClick(e, item.id)}
+						className={`block border-l-4 py-2 pl-4 pr-3 text-base font-medium ${isActive(item.id)
+							? "border-primary-600 bg-primary-50/80 text-gray-700"
+							: "border-transparent text-gray-700"
+							}`}
+					>
+						{item.label}
+					</a>
+				))}
 			</div>
 		</div>
 	)

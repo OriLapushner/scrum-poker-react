@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/container"
 
 export function FeaturesSection() {
 	return (
-		<Section id="features" className="bg-gray-50">
+		<Section id="features">
 			<Container>
 				<div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
 					<h2 className="text-3xl font-bold leading-tight tracking-tighter text-gray-900 md:text-4xl">

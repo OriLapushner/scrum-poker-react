@@ -60,7 +60,7 @@ export function RoomTable({ className, currentRoundResult }: RoomTableProps) {
 								<div className="flex items-baseline gap-2">
 									<span className="text-xs text-slate-500">Average:</span>
 									<span className="text-sm font-bold text-primary">
-										{currentRoundResult.result}
+										{currentRoundResult.result.toFixed(3)}
 									</span>
 								</div>
 							</div>
