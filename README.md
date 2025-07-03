@@ -4,6 +4,8 @@ A real-time planning poker application built with React, Next.js, and Socket.IO 
 
 **🌐 Live at: [scrum-poker.site](scrum-poker.site)**
 
+**🔗 Backend Repository: [scrum-poker-backend](https://github.com/OriLapushner/scrum-poker-backend)**
+
 ## 🚀 Features
 
 - **Real-time Collaboration**: Seamless voting experience with instant updates across all participants
@@ -17,10 +19,6 @@ A real-time planning poker application built with React, Next.js, and Socket.IO 
 - **State Management**: Zustand
 - **UI Components**: Shadcn with Tailwind CSS
 - **Real-time Communication**: Socket.IO
-
-## 🔒 Backend
-
-This repository contains only the frontend code for the Scrum Poker application. The backend code is closed-source and maintained separately. The frontend communicates with the backend via Socket.IO for real-time updates.
 
 ## 🛠️ Setup & Development
 
