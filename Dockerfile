@@ -11,6 +11,9 @@ FROM oven/bun:latest AS builder
 
 WORKDIR /app
 
+ARG NEXT_PUBLIC_SERVER_ADDRESS
+ENV NEXT_PUBLIC_SERVER_ADDRESS=$NEXT_PUBLIC_SERVER_ADDRESS
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
